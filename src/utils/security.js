@@ -56,16 +56,6 @@ export const validateLength = (str, maxLength = 500) => {
 }
 
 /**
- * メールアドレスの形式を検証
- * @param {string} email - メールアドレス
- * @returns {boolean} 有効な場合 true
- */
-export const validateEmail = (email) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRegex.test(email)
-}
-
-/**
  * 日付形式（YYYY-MM-DD）を検証
  * @param {string} date - 日付文字列
  * @returns {boolean} 有効な場合 true

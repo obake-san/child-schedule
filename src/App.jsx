@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
-import Calendar from 'react-calendar'
-import 'react-calendar/dist/Calendar.css'
 import { ChildCalendar } from './components/ChildCalendar'
 import { Footer } from './components/Footer'
 import { PolicyModal } from './components/PolicyModal'
@@ -8,41 +6,12 @@ import { generateSchedule, formatDate, formatRange, groupScheduleByMonth, groupS
 import { getLocalSchedules } from './lib/localSchedules.js'
 import { initializeFirebase, saveDataToFirebase, listenToData, checkAndDeleteOldData, updateLastAccessedAt, deleteDataFromFirebase, listenToStatistics, initializeStatistics, incrementUserCount, incrementChildCount, getDataFromFirebase } from './firebase'
 import { sanitizeInput, sanitizeObject, validateLength, validateDate, validateUUID } from './utils/security'
+import { useDeviceType } from './utils/responsive'
 import { STORAGE_KEY, FORM_STORAGE_KEY, GROUP_ID_STORAGE_KEY, PREFECTURES_MUNICIPALITIES, INITIAL_FORM, INITIAL_EDIT_FORM, INITIAL_EDIT_CHILD_FORM } from './constants'
 import { useChildrenState, useFormState, useScheduleEditState, useUIState } from './hooks/useAppState'
 import { createNewChild, confirmDeleteChild, validateChildEdit, updateChildInfo, validateScheduleForm, createNewSchedule, saveToLocalStorage, exportDataAsJSON, getScheduleFormDefaults, generateShareUrl, copyShareUrlToClipboard, decompressShareData } from './utils/handlers'
 import { downloadCalendarFile } from './utils/calendar'
 import { importDataFromFile, clearFileInput, validateImportedData } from './utils/importExport'
-
-// デバイスタイプ判定関数
-const getDeviceType = () => {
-  if (typeof window === 'undefined') return 'desktop'
-  const width = window.innerWidth
-  if (width < 640) return 'mobile'
-  if (width < 1024) return 'tablet'
-  return 'desktop'
-}
-
-// レスポンシブデバイス検出カスタムフック
-const useDeviceType = () => {
-  const [deviceType, setDeviceType] = useState(() => getDeviceType())
-
-  useEffect(() => {
-    const handleResize = () => setDeviceType(getDeviceType())
-    let timeoutId
-    const debouncedResize = () => {
-      clearTimeout(timeoutId)
-      timeoutId = setTimeout(handleResize, 150)
-    }
-    window.addEventListener('resize', debouncedResize)
-    return () => {
-      window.removeEventListener('resize', debouncedResize)
-      clearTimeout(timeoutId)
-    }
-  }, [])
-
-  return deviceType
-}
 
 function App() {
   const today = new Date().toISOString().slice(0, 10)
@@ -75,30 +44,6 @@ function App() {
   useEffect(() => {
     // 初期化時のみローカルストレージから読み込む
     try {
-      // コンソール出力を初期化時のみ抑制（2秒間）
-      const originalError = console.error
-      const originalWarn = console.warn
-      const originalLog = console.log
-      
-      console.error = () => {}
-      console.warn = () => {}
-      console.log = () => {}
-      
-      // Promise rejection エラーと unhandledrejection をフィルタリング
-      const handleRejection = (event) => {
-        if (event.reason && event.reason.toString().includes('identitytoolkit')) {
-          event.preventDefault()
-        }
-      }
-      window.addEventListener('unhandledrejection', handleRejection)
-      
-      const restoreConsole = setTimeout(() => {
-        console.error = originalError
-        console.warn = originalWarn
-        console.log = originalLog
-        window.removeEventListener('unhandledrejection', handleRejection)
-      }, 3000)
-      
       // URL共有からのデータをチェック
       const params = new URLSearchParams(window.location.search)
       
@@ -181,13 +126,8 @@ function App() {
         }
       }
       
-      // クリーンアップ関数
-      return () => {
-        clearTimeout(restoreConsole)
-        window.removeEventListener('unhandledrejection', handleRejection)
-      }
     } catch (error) {
-      // エラーの場合もコンソール復元
+      // エラーの場合も続行
     }
   }, [])
 
