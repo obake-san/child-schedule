@@ -1,0 +1,63 @@
+{
+  "rules": {
+    "groups": {
+      "$groupId": {
+        ".read": true,
+        ".write": true,
+        ".validate": "newData.hasChildren(['children']) || newData.hasChildren(['form']) || newData.hasChildren(['children', 'form'])",
+        "children": {
+          ".indexOn": ["id", "name"],
+          "$childId": {
+            ".validate": "newData.hasChildren(['id', 'name', 'birthDate'])",
+            "id": {
+              ".validate": "newData.isString() && newData.val().length > 0"
+            },
+            "name": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+            },
+            "birthDate": {
+              ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}$/)"
+            },
+            "gender": {
+              ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 10)"
+            },
+            "prefecture": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
+            },
+            "municipality": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+            },
+            "selectedCategories": {
+              ".validate": "true"
+            },
+            "customSchedules": {
+              ".validate": "true"
+            },
+            "excludedScheduleIds": {
+              ".validate": "true"
+            },
+            "schedule": {
+              ".validate": "true"
+            }
+          }
+        },
+        "form": {
+          ".validate": "true",
+          "groupName": {
+            ".validate": "newData.isString() && newData.val().length <= 100"
+          }
+        }
+      }
+    },
+    "stats": {
+      ".read": true,
+      ".write": true,
+      "totalUsers": {
+        ".validate": "newData.isNumber()"
+      },
+      "totalChildren": {
+        ".validate": "newData.isNumber()"
+      }
+    }
+  }
+}
