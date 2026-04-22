@@ -168,18 +168,17 @@ export const exportDataAsJSON = (children, form) => {
 /**
  * フォーム初期化（デフォルト値）
  */
-export const getScheduleFormDefaults = () => {
-  const today = new Date().toISOString().slice(0, 10)
-  return {
-    title: '',
-    date: today,
-    endDate: today,
-    description: '',
-    category: '準備',
-    todos: [],
-    supplies: []
-  }
-}
+const getTodayDate = () => new Date().toISOString().slice(0, 10)
+
+export const getScheduleFormDefaults = () => ({
+  title: '',
+  date: getTodayDate(),
+  endDate: getTodayDate(),
+  description: '',
+  category: '育児準備',
+  todos: [],
+  supplies: []
+})
 
 /**
  * 共有URL生成（超コンパクト版 - パス形式）

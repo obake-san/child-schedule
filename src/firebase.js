@@ -1,7 +1,11 @@
 import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, set, get, onValue } from 'firebase/database'
-import { getAuth, signInAnonymously } from 'firebase/auth'
+import { getAuth } from 'firebase/auth'
+import { DEFAULT_FORM } from './constants'
 
+/**
+ * Firebase設定と初期化
+ */
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -16,66 +20,38 @@ const app = initializeApp(firebaseConfig)
 const database = getDatabase(app)
 const auth = getAuth(app)
 
-// デフォルトフォームデータ
-const DEFAULT_FORM = {
-  name: '',
-  birthDate: new Date().toISOString().slice(0, 10),
-  gender: 'male',
-  selectedCategories: [],
-  prefecture: '',
-  municipality: '',
-  title: '',
-  date: new Date().toISOString().slice(0, 10),
-  endDate: new Date().toISOString().slice(0, 10),
-  description: '',
-  category: '準備',
-  todos: [],
-  supplies: []
-}
-
-// フォームデータを安全に整形
+/**
+ * フォームデータを安全に整形
+ */
 const getSafeFormData = (formData) => ({
-  name: formData?.name || DEFAULT_FORM.name,
-  birthDate: formData?.birthDate || DEFAULT_FORM.birthDate,
-  gender: formData?.gender || DEFAULT_FORM.gender,
+  name: formData?.name ?? DEFAULT_FORM.name,
+  birthDate: formData?.birthDate ?? DEFAULT_FORM.birthDate,
+  gender: formData?.gender ?? DEFAULT_FORM.gender,
   selectedCategories: Array.isArray(formData?.selectedCategories) ? formData.selectedCategories : [],
-  prefecture: formData?.prefecture || DEFAULT_FORM.prefecture,
-  municipality: formData?.municipality || DEFAULT_FORM.municipality,
-  title: formData?.title || DEFAULT_FORM.title,
-  date: formData?.date || DEFAULT_FORM.date,
-  endDate: formData?.endDate || DEFAULT_FORM.endDate,
-  description: formData?.description || DEFAULT_FORM.description,
-  category: formData?.category || DEFAULT_FORM.category,
+  prefecture: formData?.prefecture ?? DEFAULT_FORM.prefecture,
+  municipality: formData?.municipality ?? DEFAULT_FORM.municipality,
+  title: formData?.title ?? DEFAULT_FORM.title,
+  date: formData?.date ?? DEFAULT_FORM.date,
+  endDate: formData?.endDate ?? DEFAULT_FORM.endDate,
+  description: formData?.description ?? DEFAULT_FORM.description,
+  category: formData?.category ?? DEFAULT_FORM.category,
   todos: Array.isArray(formData?.todos) ? formData.todos : [],
   supplies: Array.isArray(formData?.supplies) ? formData.supplies : []
 })
 
-// Firebase初期化とアノニマス認証（オプショナル）
-export const initializeFirebase = async () => {
-  try {
-    const user = auth.currentUser
-    if (!user) {
-      try {
-        // アノニマスユーザーとしてサインイン
-        await signInAnonymously(auth)
-      } catch (authError) {
-        // 認証に失敗してもアプリは継続（Authentication が有効でない場合など）
-      }
-    }
-  } catch (error) {
-    // エラーでもアプリは続行（コンソール出力なし）
-  }
-}
-
-// Firebaseにデータを保存（子どもがいない場合は保存しない）
-// 戻り値: { saved: boolean }
+/**
+ * Firebaseにデータを保存
+ * 子どもが1人もいない場合は保存しない
+ * @param {string} groupId - グループID
+ * @param {Object} data - 保存するデータ { children, form }
+ * @returns {Promise<{saved: boolean}>} 保存結果
+ */
 export const saveDataToFirebase = async (groupId, data) => {
   try {
     if (!groupId || !data) {
       throw new Error('groupId and data are required')
     }
 
-    // 子どもが1人もいない場合は保存しない
     const hasChildren = Array.isArray(data.children) && data.children.length > 0
     if (!hasChildren) {
       return { saved: false }
@@ -96,7 +72,11 @@ export const saveDataToFirebase = async (groupId, data) => {
   }
 }
 
-// Firebaseからグループを削除
+/**
+ * Firebaseからグループを削除
+ * @param {string} groupId - グループID
+ * @returns {Promise<boolean>} 削除成功フラグ
+ */
 export const deleteDataFromFirebase = async (groupId) => {
   try {
     if (!groupId) {
@@ -112,7 +92,12 @@ export const deleteDataFromFirebase = async (groupId) => {
   }
 }
 
-// Firebaseからリアルタイムでデータをリスニング
+/**
+ * Firebaseからリアルタイムでデータをリスニング
+ * @param {string} groupId - グループID
+ * @param {Function} callback - データ変更時のコールバック
+ * @returns {Function} unsubscribe 関数
+ */
 export const listenToData = (groupId, callback) => {
   try {
     if (!groupId || !callback) {
@@ -121,7 +106,7 @@ export const listenToData = (groupId, callback) => {
 
     const dbRef = ref(database, `groups/${groupId}`)
     
-    onValue(dbRef, (snapshot) => {
+    const unsubscribe = onValue(dbRef, (snapshot) => {
       const data = snapshot.val()
       
       if (data) {
@@ -144,8 +129,12 @@ export const listenToData = (groupId, callback) => {
     }, (error) => {
       console.error('Firebase listener error:', error.message)
     })
+    
+    // unsubscribe 関数を返す
+    return unsubscribe
   } catch (error) {
     console.error('Firebase listener setup error:', error.message)
+    return () => {} // エラー時は空の関数を返す
   }
 }
 

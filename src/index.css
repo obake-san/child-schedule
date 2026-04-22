@@ -1,9 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap');
+
+html {
+  scrollbar-gutter: stable;
+}
+
 :root {
   color-scheme: light;
-  font-family: 'Segoe UI', Yu Gothic, 'Hiragino Kaku Gothic Pro', sans-serif;
-  background: #f4f7fb;
-  color: #1e293b;
+  font-family: 'Zen Maru Gothic', 'Segoe UI', Yu Gothic, 'Hiragino Kaku Gothic Pro', sans-serif;
+  background: #EBD1B8;
+  color: #5a4a42;
   --base-font-size: 16px;
+  
+  /* 配色システム */
+  --color-primary: #B57C56;
+  --color-primary-light: #E8B896;
+  --color-primary-lighter: #FAF3ED;
+  --color-primary-bg: #F5E6D3;
+  --color-primary-border: #E8C4A8;
+  --color-text-dark: #5A3D28;
+  --color-text-medium: #7A5B4F;
+  --color-text-light: #9B7662;
+  --color-brown-light: #EBD1B8;
+  
+  /* パネル背景 */
+  --panel-bg: linear-gradient(135deg, #FAF3ED 0%, #F5E6D3 100%);
+  --panel-shadow: 0 8px 24px rgba(180, 140, 120, 0.1);
+  
+  /* ボタン */
+  --button-bg: linear-gradient(135deg, #E8B896 0%, #B57C56 100%);
+  --button-hover-bg: linear-gradient(135deg, #E0A880 0%, #A87050 100%);
 }
 
 @media (max-width: 768px) {
@@ -19,7 +44,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 100%);
+  background: linear-gradient(180deg, #F5E6D3 0%, #EBD1B8 50%, #E8C4A8 100%);
   font-size: var(--base-font-size);
 }
 
@@ -30,24 +55,27 @@ select {
 }
 
 .app-shell {
+  width: 100%;
   max-width: 1080px;
   margin: 0 auto;
   padding: 24px;
 }
 
 .hero {
+  width: 100%;
+  margin: 0 0 24px 0;
   padding: 32px 24px;
   border-radius: 22px;
-  background: white;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
-  margin-bottom: 24px;
+  background: var(--panel-bg);
+  box-shadow: var(--panel-shadow);
+  border: 2px solid var(--color-primary-border);
 }
 
 .eyebrow {
   margin: 0 0 12px;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #2563eb;
+  color: #9B5A2D;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -56,11 +84,12 @@ select {
   margin: 0;
   font-size: clamp(2rem, 2.5vw, 3rem);
   line-height: 1.05;
+  color: var(--color-text-dark);
 }
 
 .description {
   margin: 16px 0 0;
-  color: #475569;
+  color: var(--color-text-medium);
   line-height: 1.7;
 }
 
@@ -80,7 +109,7 @@ select {
 .count-up-number {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #2563eb;
+  color: var(--color-primary);
   line-height: 1;
 }
 
@@ -92,19 +121,23 @@ select {
 }
 
 main {
-  display: grid;
-  gap: 24px;
+  display: contents;
 }
 
 .panel {
-  background: white;
-  border-radius: 24px;
-  padding: 24px;
-  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.06);
+  width: 100%;
+  max-width: 100%;
+  margin: 0 0 24px 0;
+  background: var(--panel-bg);
+  border-radius: 22px;
+  padding: 32px 24px;
+  box-shadow: var(--panel-shadow);
+  border: 2px solid var(--color-primary-border);
 }
 
 .panel h2 {
   margin-top: 0;
+  color: #B57C56;
 }
 
 .section-header {
@@ -121,19 +154,20 @@ main {
 }
 
 .view-toggle button {
-  border: 1px solid #cbd5e1;
-  background: #f8fafc;
-  color: #475569;
+  border: 2px solid var(--color-primary-border);
+  background: var(--color-primary-lighter);
+  color: var(--color-text-light);
   border-radius: 999px;
   padding: 10px 16px;
   cursor: pointer;
   font-weight: 700;
+  transition: all 0.2s;
 }
 
 .view-toggle button.active {
-  background: #2563eb;
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
   color: white;
-  border-color: #2563eb;
+  border-color: var(--color-primary);
 }
 
 .child-filter-tabs {
@@ -145,23 +179,24 @@ main {
 }
 
 .child-filter-tabs button {
-  border: 2px solid #cbd5e1;
-  background: #f8fafc;
-  color: #475569;
+  border: 2px solid #E8C4A8;
+  background: #FAF3ED;
+  color: #9B7662;
   border-radius: 999px;
   padding: 8px 14px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.95rem;
+  transition: all 0.2s;
 }
 
 .child-filter-tabs button.active {
-  background: #10b981;
+  background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
   color: white;
-  border-color: #10b981;
+  border-color: #4ade80;
 }
 
-/* Googleカレンダー風UIの実装 */
+/* Googleカレンダー風UIの実裁E*/
 
 .calendar-view {
   display: flex;
@@ -183,18 +218,18 @@ main {
   font-size: 1.5rem;
   cursor: pointer;
   padding: 4px 8px;
-  color: #1f2937;
+  color: #9B7662;
   transition: color 0.2s;
 }
 
 .nav-button:hover {
-  color: #4f46e5;
+  color: #B57C56;
 }
 
 .calendar-header {
   font-size: 1.3rem;
   font-weight: 700;
-  color: #202124;
+  color: #7A5B4F;
   margin: 0;
   min-width: 160px;
   text-align: center;
@@ -219,35 +254,35 @@ main {
   margin: 0 0 16px 0;
 }
 
-/* カレンダーグリッド */
+/* カレンダーグリチE�E��E� */
 .calendar-week {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  background: #e2e8f0;
-  border: 1px solid #e2e8f0;
+  background: #E8C4A8;
+  border: 1px solid #E8C4A8;
   margin-bottom: 1px;
 }
 
-/* 日付ヘッダー */
+/* 日付�EチE�E��E�ー */
 .calendar-timeline-header {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1px;
-  background: #e2e8f0;
+  background: #EBD1B8;
   box-sizing: border-box;
   position: relative;
   z-index: 1;
 }
 
 .timeline-day-cell {
-  background: #f9fafb;
+  background: #FAF3ED;
   padding: 4px 8px;
   text-align: right;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #202124;
-  border-bottom: 1px solid #e8eaed;
+  color: #7A5B4F;
+  border-bottom: 1px solid #E8C4A8;
   display: flex;
   align-items: flex-start;
   min-height: 36px;
@@ -255,13 +290,13 @@ main {
 }
 
 .timeline-day-cell.empty {
-  background: #e8eaed;
+  background: #E8C4A8;
 }
 
 .timeline-day-number {
   display: block;
   font-weight: 600;
-  color: #202124;
+  color: #7A5B4F;
 }
 
 .timeline-day-weekday {
@@ -272,8 +307,8 @@ main {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 1px;
-  background: #f3f4f6;
-  border-bottom: 1px solid #e2e8f0;
+  background: #F5E6D3;
+  border-bottom: 1px solid #E8C4A8;
 }
 
 .weekday-cell {
@@ -283,44 +318,85 @@ main {
   padding: 8px 4px;
   font-weight: 600;
   font-size: 0.875rem;
-  color: #202124;
-  background: white;
+  color: #7A5B4F;
+  background: #FAF3ED;
   min-height: 32px;
 }
 
 .weekday-cell.weekend {
-  color: #d32f2f;
+  color: #DC2626;
 }
 
 .timeline-day-cell.holiday .timeline-day-number {
-  color: #d32f2f;
+  color: #DC2626;
 }
 
-/* スケジュール行 */
+.timeline-day-cell.today {
+  background: #F4D87F;
+  border-radius: 4px;
+}
+
+.timeline-day-cell.today .timeline-day-number {
+  color: #7A5B4F;
+  font-weight: 700;
+}
+
+/* スケジュール衁E*/
 .calendar-event-layer {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: minmax(auto, 30px);
+  grid-auto-flow: dense;
   gap: 1px;
   background: white;
-  min-height: 120px;
+  min-height: 30px;
   box-sizing: border-box;
+  align-items: stretch;
+}
+
+/* Row span utilities */
+.row-span-1 {
+  grid-row: span 1;
+}
+
+.row-span-2 {
+  grid-row: span 2;
+}
+
+.row-span-3 {
+  grid-row: span 3;
+}
+
+.row-span-4 {
+  grid-row: span 4;
+}
+
+.row-span-5 {
+  grid-row: span 5;
+}
+
+/* Empty cells - stretch to fill container */
+.empty-cell-start,
+.empty-cell-end {
+  height: 100%;
 }
 
 .calendar-event {
   background: white;
-  padding: 2px 4px;
-  margin: 2px 2px;
+  padding: 1px 3px;
+  margin: 1px 1px;
   border-radius: 2px;
-  font-size: 0.8rem;
-  line-height: 1.3;
-  color: #202124;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  color: #7A5B4F;
   overflow: hidden;
   display: block;
   text-overflow: ellipsis;
   white-space: nowrap;
   border-left: 4px solid;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  min-height: 24px;
+  border: 1px solid #E8C4A8;
+  box-shadow: 0 1px 2px rgba(122, 91, 79, 0.15);
+  min-height: 22px;
   box-sizing: border-box;
 }
 
@@ -333,81 +409,86 @@ main {
   display: none;
 }
 
-/* カテゴリーカラー（Googleカレンダー風） */
-.calendar-event.category-手続き {
-  border-left-color: #1e40af;
-  background-color: #1e40af;
-  color: #ffffff;
+/* カチE�E��E�リーカラー�E�E�E�Eoogleカレンダー風�E�E�E�E*/
+.calendar-event.category-行政手続き {
+  border-left-color: #b084cc;
+  border-color: #b084cc;
+  background-color: #d8b4fe;
+  color: #6b21a8;
 }
 
 .calendar-event.category-予防接種 {
-  border-left-color: #16a34a;
-  background-color: #16a34a;
-  color: #ffffff;
+  border-left-color: #65a30d;
+  border-color: #65a30d;
+  background-color: #86efac;
+  color: #166534;
 }
 
 .calendar-event.category-保育園 {
-  border-left-color: #dc2626;
-  background-color: #dc2626;
-  color: #ffffff;
+  border-left-color: #ec4899;
+  border-color: #ec4899;
+  background-color: #f8bef0;
+  color: #9d174d;
 }
 
-.calendar-event.category-準備 {
+.calendar-event.category-幼稚園 {
+  border-left-color: #0891b2;
+  border-color: #0891b2;
+  background-color: #a5f3fc;
+  color: #0e5459;
+}
+
+.calendar-event.category-育児準備 {
   border-left-color: #d97706;
-  background-color: #d97706;
-  color: #ffffff;
-}
-
-.calendar-event.category-行事 {
-  border-left-color: #dc2626;
-  background-color: #dc2626;
-  color: #ffffff;
+  border-color: #d97706;
+  background-color: #fecab8;
+  color: #92400e;
 }
 
 .calendar-event.category-入学準備 {
-  border-left-color: #1e40af;
-  background-color: #1e40af;
-  color: #ffffff;
+  border-left-color: #b084cc;
+  border-color: #b084cc;
+  background-color: #d8b4fe;
+  color: #6b21a8;
 }
 
 .calendar-event.category-健康診断 {
-  border-left-color: #7c3aed;
-  background-color: #7c3aed;
-  color: #ffffff;
-}
-
-.calendar-event.category-行政手続き {
-  border-left-color: #6b7280;
-  background-color: #6b7280;
-  color: #ffffff;
+  border-left-color: #a78bfa;
+  border-color: #a78bfa;
+  background-color: #e9d5ff;
+  color: #6b21a8;
 }
 
 .calendar-event.category-生活・成長 {
-  border-left-color: #f59e0b;
-  background-color: #f59e0b;
-  color: #ffffff;
+  border-left-color: #f87171;
+  border-color: #f87171;
+  background-color: #fecaca;
+  color: #991b1b;
 }
 
 .calendar-event.category-教育・発達 {
-  border-left-color: #0d9488;
-  background-color: #0d9488;
-  color: #ffffff;
+  border-left-color: #0284c7;
+  border-color: #0284c7;
+  background-color: #bae6fd;
+  color: #0c4a6e;
 }
 
-.calendar-event.category-記念イベント {
-  border-left-color: #be185d;
-  background-color: #be185d;
-  color: #ffffff;
+.calendar-event.category-行事・記念イベント {
+  border-left-color: #ec4899;
+  border-color: #ec4899;
+  background-color: #fbcfe8;
+  color: #9d174d;
 }
 
 .calendar-event.category-学校関連 {
   border-left-color: #0891b2;
-  background-color: #0891b2;
-  color: #ffffff;
+  border-color: #0891b2;
+  background-color: #a5f3fc;
+  color: #0e5459;
 }
 
 .calendar-event.empty {
-  background: #e8eaed !important;
+  background: #E8C4A8 !important;
   border-left: none !important;
   border: none !important;
   box-shadow: none !important;
@@ -419,6 +500,7 @@ main {
 .input-form {
   display: grid;
   gap: 16px;
+  overflow: hidden;
 }
 
 .input-form label {
@@ -432,9 +514,17 @@ main {
 .input-form select {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid #cbd5e1;
+  border: 2px solid var(--color-primary-border);
   border-radius: 14px;
-  background: #f8fafc;
+  background: white;
+  transition: all 0.2s;
+}
+
+.input-form input:focus,
+.input-form select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  background: white;
 }
 
 .input-form button {
@@ -442,14 +532,18 @@ main {
   padding: 14px 18px;
   border: none;
   border-radius: 14px;
-  background: #2563eb;
+  background: var(--button-bg);
   color: white;
   font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
 }
 
 .input-form button:hover {
-  background: #1d4ed8;
+  background: var(--button-hover-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(181, 124, 86, 0.3);
 }
 
 .form-error {
@@ -457,24 +551,50 @@ main {
   color: #dc2626;
 }
 
+.edit-form .form-error {
+  margin: -8px 0 12px 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.input-form .form-error {
+  margin: -8px 0 12px 0;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
 .category-fieldset {
-  border: 1px solid #cbd5e1;
+  border: 2px solid #E8C4A8;
   border-radius: 14px;
-  padding: 16px;
-  background: #f8fafc;
+  padding: 12px 24px 16px 24px;
+  background: white;
+  position: relative;
+  margin-top: 32px;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .category-fieldset legend {
   color: #334155;
   font-weight: 600;
-  padding: 0 8px;
+  padding: 0;
+  position: absolute;
+  top: -32px;
+  left: -2px;
+  display: block;
 }
 
 .category-checkboxes {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 12px;
-  margin-top: 12px;
+  margin-top: 0;
 }
 
 .category-checkbox {
@@ -486,6 +606,10 @@ main {
   color: #475569;
   cursor: pointer;
   white-space: nowrap;
+}
+
+.category-checkbox-all {
+  grid-column: 1 / -1;
 }
 
 .category-checkbox input[type="checkbox"] {
@@ -503,10 +627,11 @@ main {
 }
 
 .child-card {
-  border: 1px solid #e2e8f0;
+  border: 2px solid #E8C4A8;
   border-radius: 18px;
   padding: 20px;
   margin-bottom: 20px;
+  background: white;
 }
 
 .child-header {
@@ -527,12 +652,19 @@ main {
 }
 
 .remove-button {
-  border: 1px solid #e2e8f0;
-  background: #ffffff;
+  border: 2px solid #F5DCC8;
+  background: #FCF7F1;
   border-radius: 14px;
   padding: 10px 14px;
   cursor: pointer;
-  color: #475569;
+  color: #B57C56;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.remove-button:hover {
+  background: #F5DCC8;
+  color: #8B5F45;
 }
 
 .schedule-grid {
@@ -546,11 +678,7 @@ main {
   padding: 18px;
   border-radius: 0;
   background: #fff;
-  border: 1px solid #e2e8f0;
-}
-
-.schedule-grid > .schedule-item:first-child {
-  border-top: none;
+  border: 1px solid #E8C4A8;
 }
 
 .input-form {
@@ -558,10 +686,9 @@ main {
   gap: 16px;
 }
 
-.calendar-event.category-手続き { background: #2563eb; }
-.calendar-event.category-予防接種 { background: #16a34a; }
-.calendar-event.category-保育園 { background: #7c3aed; }
-.calendar-event.category-準備 { background: #f97316; }
+.calendar-event.category-行政手続き { background: #d8b4fe; color: #6b21a8; }
+.calendar-event.category-予防接種 { background: #86efac; color: #166534; }
+.calendar-event.category-保育園 { background: #f8bef0; color: #9d174d; }
 .item-meta {
   display: flex;
   flex-wrap: wrap;
@@ -585,18 +712,17 @@ main {
   font-weight: 600;
 }
 
-.item-category.category-手続き { background-color: #1e40af; }
-.item-category.category-予防接種 { background-color: #16a34a; }
-.item-category.category-保育園 { background-color: #dc2626; }
-.item-category.category-準備 { background-color: #d97706; }
-.item-category.category-行事 { background-color: #dc2626; }
-.item-category.category-入学準備 { background-color: #1e40af; }
-.item-category.category-健康診断 { background-color: #7c3aed; }
-.item-category.category-行政手続き { background-color: #6b7280; }
-.item-category.category-生活・成長 { background-color: #f59e0b; }
-.item-category.category-教育・発達 { background-color: #0d9488; }
-.item-category.category-記念イベント { background-color: #be185d; }
-.item-category.category-学校関連 { background-color: #0891b2; }
+.item-category.category-行政手続き { background-color: #d8b4fe; color: #6b21a8; }
+.item-category.category-育児準備 { background-color: #fecab8; color: #92400e; }
+.item-category.category-健康診断 { background-color: #e9d5ff; color: #6b21a8; }
+.item-category.category-予防接種 { background-color: #86efac; color: #166534; }
+.item-category.category-保育園 { background-color: #f8bef0; color: #9d174d; }
+.item-category.category-幼稚園 { background-color: #a5f3fc; color: #0e5459; }
+.item-category.category-生活・成長 { background-color: #fecaca; color: #991b1b; }
+.item-category.category-教育・発達 { background-color: #bae6fd; color: #0c4a6e; }
+.item-category.category-入学準備 { background-color: #d8b4fe; color: #6b21a8; }
+.item-category.category-学校関連 { background-color: #a5f3fc; color: #0e5459; }
+.item-category.category-行事・記念イベント { background-color: #fbcfe8; color: #9d174d; }
 
 .item-todos,
 .item-supplies {
@@ -626,16 +752,18 @@ main {
   color: #334155;
   font-size: 0.9rem;
 }
-  font-weight: 700;
-  color: white;
-}
 
-.category-手続き { background: #2563eb; }
-.category-予防接種 { background: #16a34a; }
-.category-保育園 { background: #7c3aed; }
-.category-準備 { background: #f97316; }
-.category-行事 { background: #ec4899; }
-.category-入学準備 { background: #06b6d4; }
+.category-行政手続き { background: #d8b4fe; color: #6b21a8; }
+.category-予防接種 { background: #86efac; color: #166534; }
+.category-保育園 { background: #f8bef0; color: #9d174d; }
+.category-幼稚園 { background: #a5f3fc; color: #0e5459; }
+.category-育児準備 { background: #fecab8; color: #92400e; }
+.category-健康診断 { background: #e9d5ff; color: #6b21a8; }
+.category-教育・発達 { background: #bae6fd; color: #0c4a6e; }
+.category-生活・成長 { background: #fecaca; color: #991b1b; }
+.category-入学準備 { background: #d8b4fe; color: #6b21a8; }
+.category-学校関連 { background: #a5f3fc; color: #0e5459; }
+.category-行事・記念イベント { background: #fbcfe8; color: #9d174d; }
 
 @media (max-width: 768px) {
   :root {
@@ -648,6 +776,7 @@ main {
 
   .hero,
   .panel {
+    margin: 0 0 24px 0;
     padding: 20px;
   }
 
@@ -690,9 +819,9 @@ main {
   }
 
   .calendar-event {
-    font-size: 0.75rem;
-    min-height: 20px;
-    padding: 2px 2px;
+    font-size: 0.7rem;
+    min-height: 18px;
+    padding: 1px 2px;
     margin: 1px 1px;
   }
 
@@ -794,13 +923,14 @@ main {
 }
 
 .modal-content {
-  background: white;
+  background: linear-gradient(135deg, #FAF3ED 0%, #F5E6D3 100%);
   border-radius: 24px;
   max-width: 600px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.15);
+  box-shadow: 0 20px 50px rgba(180, 140, 120, 0.15);
+  border: 2px solid #E8C4A8;
   position: relative;
 }
 
@@ -851,6 +981,7 @@ main {
   display: grid;
   gap: 16px;
   padding: 0 24px;
+  overflow: hidden;
 }
 
 .edit-form label {
@@ -865,10 +996,19 @@ main {
 .edit-form textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid #cbd5e1;
+  border: 2px solid #E8C4A8;
   border-radius: 14px;
-  background: #f8fafc;
+  background: white;
   font-family: inherit;
+  transition: all 0.2s;
+}
+
+.edit-form input:focus,
+.edit-form select:focus,
+.edit-form textarea:focus {
+  outline: none;
+  border-color: #B57C56;
+  background: white;
 }
 
 .edit-form textarea {
@@ -891,23 +1031,35 @@ main {
 }
 
 .delete-button {
-  background: #dc2626;
-  color: white;
-  border: none;
+  background: #F5DCC8;
+  color: #8B5F45;
+  border: 2px solid #F5DCC8;
   border-radius: 14px;
   padding: 12px 16px;
   cursor: pointer;
   font-weight: 600;
+  transition: all 0.2s;
+}
+
+.delete-button:hover {
+  background: #EFC9B0;
+  border-color: #DAB39A;
 }
 
 .cancel-button {
-  background: #f1f5f9;
-  color: #475569;
-  border: 1px solid #cbd5e1;
+  background: #E8C4A8;
+  color: #7A5B4F;
+  border: 2px solid #E8C4A8;
   border-radius: 14px;
   padding: 12px 16px;
   cursor: pointer;
   font-weight: 600;
+  transition: all 0.2s;
+}
+
+.cancel-button:hover {
+  background: #DBAF94;
+  border-color: #C9956D;
 }
 
 .combined-calendar-view h3 {
@@ -924,10 +1076,10 @@ main {
 }
 
 .combined-child-card {
-  border: 1px solid #e2e8f0;
+  border: 2px solid #E8C4A8;
   border-radius: 12px;
   padding: 16px;
-  background: #f8fafc;
+  background: white;
 }
 
 .combined-child-header {
@@ -956,18 +1108,20 @@ main {
 }
 
 .edit-button {
-  background: #0ea5e9;
-  color: #fff;
+  background: linear-gradient(135deg, #F5DCC8 0%, #EFC9B0 100%);
+  color: #7A5B4F;
   border: none;
   border-radius: 14px;
   padding: 10px 14px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9rem;
+  transition: all 0.2s;
 }
 
 .edit-button:hover {
-  background: #0284c7;
+  background: linear-gradient(135deg, #EFC9B0 0%, #E8B896 100%);
+  box-shadow: 0 4px 12px rgba(181, 124, 86, 0.3);
 }
 
 .delete-button:hover {
@@ -980,7 +1134,7 @@ main {
 
 /* スケジュール追加ボタンのスタイル */
 .add-schedule-button {
-  background: #2563eb;
+  background: linear-gradient(135deg, #E8B896 0%, #B57C56 100%);
   color: white;
   border: none;
   border-radius: 14px;
@@ -989,43 +1143,42 @@ main {
   font-weight: 600;
   font-size: 0.95rem;
   white-space: nowrap;
-  transition: background 0.2s;
-}
-
-.add-schedule-button:hover {
-  background: #1d4ed8;
-}
-
-/* 子ども選択チェックボックスのスタイル */
-.children-selection {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
-  margin: 12px 0;
-}
-
-.child-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 12px;
-  background: #f8fafc;
-  cursor: pointer;
-  font-weight: 500;
   transition: all 0.2s;
 }
 
-.child-checkbox:hover {
-  background: #f1f5f9;
-  border-color: #94a3b8;
+.add-schedule-button:hover {
+  background: linear-gradient(135deg, #E0A880 0%, #A87050 100%);
+  box-shadow: 0 8px 16px rgba(181, 124, 86, 0.3);
+  transform: translateY(-2px);
+}
+
+/* 子ども選択チェチE�E��E�ボックスのスタイル */
+.children-selection {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.child-checkbox {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 .child-checkbox input[type="checkbox"] {
-  cursor: pointer;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  flex-shrink: 0;
+  accent-color: #2563eb;
 }
 
 .child-checkbox input[type="checkbox"]:checked + span {
@@ -1033,7 +1186,7 @@ main {
   font-weight: 600;
 }
 
-/* 共有ボタンのスタイル */
+/* 共有�Eタンのスタイル */
 .share-button {
   background: #22c55e;
   color: white;
@@ -1204,79 +1357,73 @@ main {
   text-align: left;
 }
 
-.tile-event.category-手続き {
-  border-left-color: #4285f4;
-  background-color: #e8f0fe;
-  color: #1a73e8;
+.tile-event.category-行政手続き {
+  border-left-color: #b084cc;
+  background-color: #d8b4fe;
+  color: #6b21a8;
 }
 
 .tile-event.category-予防接種 {
-  border-left-color: #34a853;
-  background-color: #e6f4ea;
-  color: #137333;
+  border-left-color: #65a30d;
+  background-color: #86efac;
+  color: #166534;
 }
 
 .tile-event.category-保育園 {
-  border-left-color: #ea4335;
-  background-color: #fce8e6;
-  color: #d33427;
+  border-left-color: #ec4899;
+  background-color: #f8bef0;
+  color: #9d174d;
 }
 
-.tile-event.category-準備 {
-  border-left-color: #fbbc04;
-  background-color: #fef7e0;
-  color: #f57f17;
-}
-
-.tile-event.category-行事 {
-  border-left-color: #ea4335;
-  background-color: #fce8e6;
-  color: #d33427;
+.tile-event.category-育児準備 {
+  border-left-color: #d97706;
+  background-color: #fecab8;
+  color: #92400e;
 }
 
 .tile-event.category-入学準備 {
-  border-left-color: #4285f4;
-  background-color: #e8f0fe;
-  color: #1a73e8;
+  border-left-color: #b084cc;
+  background-color: #d8b4fe;
+  color: #6b21a8;
 }
 
 .tile-event.category-健康診断 {
-  border-left-color: #9c27b0;
-  background-color: #f3e5f5;
-  color: #6a1b9a;
+  border-left-color: #a78bfa;
+  background-color: #e9d5ff;
+  color: #6b21a8;
 }
 
 .tile-event.category-行政手続き {
-  border-left-color: #757575;
-  background-color: #f5f5f5;
-  color: #424242;
+  border-left-color: #b084cc;
+  background-color: #d8b4fe;
+  color: #6b21a8;
 }
 
 .tile-event.category-生活・成長 {
-  border-left-color: #f57c00;
-  background-color: #fff3e0;
-  color: #e65100;
+  border-left-color: #f87171;
+  background-color: #fecaca;
+  color: #991b1b;
 }
 
 .tile-event.category-教育・発達 {
-  border-left-color: #00897b;
-  background-color: #e0f2f1;
-  color: #004d40;
+  border-left-color: #0284c7;
+  background-color: #bae6fd;
+  color: #0c4a6e;
 }
 
-.tile-event.category-記念イベント {
-  border-left-color: #c2185b;
-  background-color: #fce4ec;
-  color: #880e4f;
+.tile-event.category-行事・記念イベント {
+  border-left-color: #ec4899;
+  background-color: #fbcfe8;
+  color: #9d174d;
 }
 
 .tile-event.category-学校関連 {
-  border-left-color: #00bcd4;
-  background-color: #e0f7fa;
-  color: #006064;
+  border-left-color: #0891b2;
+  background-color: #a5f3fc;
+  color: #0e5459;
 }
 
-/* イベントリスト */
+/* イベントリスチE*/
 .calendar-events {
   padding: 16px;
   background: #f9fafb;
@@ -1326,70 +1473,80 @@ main {
 }
 
 /* カテゴリーカラー */
-.event-item.category-手続き {
-  border-left-color: #4285f4;
-  background: #e8f0fe;
+.event-item.category-行政手続き {
+  border-left-color: #b084cc;
+  background: #d8b4fe;
+  color: #6b21a8;
 }
 
 .event-item.category-予防接種 {
-  border-left-color: #34a853;
-  background: #e6f4ea;
+  border-left-color: #65a30d;
+  background: #86efac;
+  color: #166534;
 }
 
 .event-item.category-保育園 {
-  border-left-color: #ea4335;
-  background: #fce8e6;
+  border-left-color: #ec4899;
+  background: #f8bef0;
+  color: #9d174d;
 }
 
-.event-item.category-準備 {
-  border-left-color: #fbbc04;
-  background: #fef7e0;
-}
-
-.event-item.category-行事 {
-  border-left-color: #ea4335;
-  background: #fce8e6;
+.event-item.category-育児準備 {
+  border-left-color: #d97706;
+  background: #fecab8;
+  color: #92400e;
 }
 
 .event-item.category-入学準備 {
-  border-left-color: #4285f4;
-  background: #e8f0fe;
+  border-left-color: #b084cc;
+  background: #d8b4fe;
+  color: #6b21a8;
 }
 
 .event-item.category-健康診断 {
-  border-left-color: #9c27b0;
-  background: #f3e5f5;
-}
-
-.event-item.category-行政手続き {
-  border-left-color: #757575;
-  background: #f5f5f5;
+  border-left-color: #a78bfa;
+  background: #e9d5ff;
+  color: #6b21a8;
 }
 
 .event-item.category-生活・成長 {
-  border-left-color: #f57c00;
-  background: #fff3e0;
+  border-left-color: #f87171;
+  background: #fecaca;
+  color: #991b1b;
 }
 
 .event-item.category-教育・発達 {
-  border-left-color: #00897b;
-  background: #e0f2f1;
+  border-left-color: #0284c7;
+  background: #bae6fd;
+  color: #0c4a6e;
+}
+
+.event-item.category-行事・記念イベント {
+  border-left-color: #ec4899;
+  background: #fbcfe8;
+  color: #9d174d;
+}
+
+.event-item.category-学校関連 {
+  border-left-color: #0891b2;
+  background: #a5f3fc;
+  color: #0e5459;
 }
 
 /* =====================================================
    レスポンシブデザイン
    ===================================================== */
 
-/* モバイル（< 640px） */
+/* モバイル�E�E�E�E 640px�E�E�E�E*/
 @media (max-width: 639px) {
   .app-shell {
-    padding: 16px;
+    padding: 20px;
     max-width: 100%;
   }
 
   .hero {
-    padding: 20px 16px;
-    margin-bottom: 16px;
+    padding: 20px;
+    margin: 0 0 16px 0;
   }
 
   .hero h1 {
@@ -1400,8 +1557,18 @@ main {
     gap: 16px;
   }
 
+  .category-checkboxes {
+    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .category-checkbox {
+    font-size: 0.9rem;
+  }
+
   .panel {
-    padding: 16px;
+    margin: 0 0 24px 0;
+    padding: 20px;
     border-radius: 16px;
   }
 
@@ -1532,7 +1699,7 @@ main {
     margin-bottom: 16px;
   }
 
-  /* タッチフレンドリーなボタンサイズ */
+  /* タチE�E��E�フレンドリーなボタンサイズ */
   button {
     min-height: 44px; /* AWS/iOS 推奨 */
     min-width: 44px;
@@ -1543,7 +1710,7 @@ main {
   }
 }
 
-/* タブレット（640px - 1023px） */
+/* タブレチE�E��E��E�E�E�E40px - 1023px�E�E�E�E*/
 @media (min-width: 640px) and (max-width: 1023px) {
   .app-shell {
     padding: 20px;
@@ -1552,7 +1719,7 @@ main {
 
   .hero {
     padding: 28px 20px;
-    margin-bottom: 20px;
+    margin: 0 0 20px 0;
   }
 
   .hero h1 {
@@ -1564,11 +1731,16 @@ main {
   }
 
   .panel {
+    margin: 0 0 24px 0;
     padding: 20px;
   }
 
   .section-header {
     flex-wrap: wrap;
+  }
+
+  .category-checkboxes {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .children-grid {
@@ -1602,7 +1774,7 @@ main {
   }
 }
 
-/* デスクトップ（>= 1024px） */
+/* チE�E��E�クトップ！E= 1024px�E�E�E�E*/
 @media (min-width: 1024px) {
   .app-shell {
     max-width: 1200px;
@@ -1625,7 +1797,7 @@ main {
   }
 }
 
-/* 横向きモード（ランドスケープ） */
+/* 横向きモード（ランドスケープ！E*/
 @media (max-height: 600px) and (orientation: landscape) {
   .modal-content {
     max-height: 80vh;
@@ -1634,6 +1806,7 @@ main {
 
   .hero {
     padding: 16px 20px;
+    margin: 0 0 16px 0;
   }
 
   .hero h1 {
@@ -1641,7 +1814,7 @@ main {
   }
 }
 
-/* 高解像度ディスプレイ */
+/* 高解像度チE�E��E�スプレイ */
 @media (min-width: 1440px) {
   .app-shell {
     max-width: 1400px;
@@ -1656,7 +1829,7 @@ main {
   }
 }
 
-/* タッチスクリーン最適化 */
+/* タチE�E��E�スクリーン最適匁E*/
 @media (hover: none) and (pointer: coarse) {
   button {
     min-height: 48px; /* iOS/Android 推奨 */
@@ -1679,7 +1852,7 @@ main {
 }
 
 
-.event-item.category-記念イベント {
+.event-item.category-記念イベンチE{
   border-left-color: #c2185b;
   background: #fce4ec;
 }
@@ -1712,24 +1885,22 @@ main {
 
 .save-section {
   text-align: center;
-  background: #f0fdf4;
-  border: 1px solid #86efac;
 }
 
 .save-section h2 {
   margin-top: 0;
-  color: #15803d;
+  color: #B57C56;
 }
 
 .save-info {
   margin: 12px 0;
-  color: #3f6319;
+  color: #9B7662;
   font-size: 0.95rem;
 }
 
 .save-success {
   margin: 12px 0 0;
-  color: #15803d;
+  color: #B57C56;
   font-weight: 600;
   animation: fadeIn 0.3s ease-in;
 }
@@ -1752,12 +1923,11 @@ main {
 
 .save-button,
 .import-button-label {
-  background: #22c55e;
+  background: linear-gradient(135deg, #E8B896 0%, #B57C56 100%);
   color: white;
   border: none;
   border-radius: 14px;
   padding: 12px 24px;
-  font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s;
@@ -1765,15 +1935,15 @@ main {
 
 .save-button:hover,
 .import-button-label:hover {
-  background: #16a34a;
+  background: linear-gradient(135deg, #C9936C 0%, #A87050 100%);
 }
 
 .export-button {
-  background: #3b82f6;
+  background: linear-gradient(135deg, #E8B896 0%, #B57C56 100%);
 }
 
 .export-button:hover {
-  background: #2563eb;
+  background: linear-gradient(135deg, #C9936C 0%, #A87050 100%);
 }
 
 .import-button-label {
@@ -1781,7 +1951,7 @@ main {
   text-align: center;
 }
 
-/* 月ピッカーモーダル */
+/* 月ピチE�E��E�ーモーダル */
 .month-picker-overlay {
   position: fixed;
   top: 0;
@@ -1796,18 +1966,19 @@ main {
 }
 
 .month-picker-modal {
-  background: white;
+  background: #FAF3ED;
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 40px rgba(122, 91, 79, 0.2);
   max-width: 400px;
   width: 90%;
+  border: 2px solid #E8C4A8;
 }
 
 .month-picker-modal h3 {
   margin: 0 0 20px;
   font-size: 1.2rem;
-  color: #202124;
+  color: #7A5B4F;
   text-align: center;
 }
 
@@ -1826,25 +1997,26 @@ main {
 .picker-section label {
   font-weight: 600;
   margin-bottom: 8px;
-  color: #202124;
+  color: #7A5B4F;
   font-size: 0.95rem;
 }
 
 .picker-section input,
 .picker-section select {
   padding: 10px;
-  border: 1px solid #e2e8f0;
+  border: 2px solid #E8C4A8;
   border-radius: 8px;
   font-size: 1rem;
-  color: #202124;
+  color: #7A5B4F;
   font-family: inherit;
+  background: #FCF7F1;
 }
 
 .picker-section input:focus,
 .picker-section select:focus {
   outline: none;
-  border-color: #1f2937;
-  box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.1);
+  border-color: #B57C56;
+  box-shadow: 0 0 0 3px rgba(181, 124, 86, 0.1);
 }
 
 .month-picker-buttons {
@@ -1864,18 +2036,24 @@ main {
 }
 
 .cancel-btn {
-  background: #f1f5f9;
-  color: #475569;
-  border: 1px solid #cbd5e1;
+  background: #FCF7F1;
+  color: #9B7662;
+  border: 2px solid #E8C4A8;
 }
 
 .cancel-btn:hover {
-  background: #e2e8f0;
+  background: #FAF3ED;
+  border-color: #B57C56;
 }
 
 .confirm-btn {
-  background: #1f2937;
+  background: linear-gradient(135deg, #E8B896 0%, #B57C56 100%);
   color: white;
+  border: none;
+}
+
+.confirm-btn:hover {
+  background: linear-gradient(135deg, #E0A880 0%, #A87050 100%);
 }
 
 .confirm-btn:hover {
@@ -1887,16 +2065,16 @@ main {
    ===================================================== */
 
 .app-footer {
-  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-  color: #e2e8f0;
+  background: linear-gradient(180deg, #C99960 0%, #B8956A 100%);
+  color: #FFFFFF;
   margin-top: 60px;
   padding-top: 40px;
   padding-bottom: 20px;
-  border-top: 1px solid #334155;
+  border-top: 1px solid #9B5A2D;
 }
 
 .footer-content {
-  max-width: 1200px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 0 24px 40px;
   display: grid;
@@ -1905,7 +2083,7 @@ main {
 }
 
 .footer-section h4 {
-  color: white;
+  color: #FFFFFF;
   font-size: 0.95rem;
   font-weight: 700;
   margin: 0 0 12px;
@@ -1914,7 +2092,7 @@ main {
 }
 
 .footer-subtitle {
-  color: #60a5fa;
+  color: #FFFFFF;
   font-size: 0.85rem;
   font-weight: 700;
   margin: 0 0 8px;
@@ -1922,14 +2100,14 @@ main {
 }
 
 .footer-title {
-  color: white;
+  color: #FFFFFF;
   font-size: 1.3rem;
   font-weight: 700;
   margin: 0 0 8px;
 }
 
 .footer-description {
-  color: #cbd5e1;
+  color: #FFFFFF;
   font-size: 0.9rem;
   line-height: 1.6;
   margin: 0;
@@ -1947,7 +2125,7 @@ main {
 
 .footer-section a,
 .link-button {
-  color: #cbd5e1;
+  color: #FFFFFF;
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.2s;
@@ -1960,16 +2138,16 @@ main {
 
 .footer-section a:hover,
 .link-button:hover {
-  color: #60a5fa;
+  color: #FFE4B5;
 }
 
 .footer-bottom {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px 24px 0;
-  border-top: 1px solid #334155;
+  border-top: 1px solid #9B5A2D;
   text-align: center;
-  color: #64748b;
+  color: #FFFFFF;
   font-size: 0.85rem;
 }
 
@@ -1979,7 +2157,7 @@ main {
 
 .footer-version {
   font-size: 0.8rem;
-  color: #475569;
+  color: #FFFFFF;
 }
 
 /* ポリシーモーダルスタイル */
@@ -2062,3 +2240,61 @@ main {
     max-height: 90vh;
   }
 }
+
+/* =====================================================
+   フローティングボタン
+   ===================================================== */
+
+.floating-feedback-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: linear-gradient(135deg, #E8B896 0%, #B57C56 100%);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 6px 20px rgba(181, 124, 86, 0.4);
+  z-index: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  border: none;
+}
+
+.floating-feedback-button:hover {
+  background: linear-gradient(135deg, #E0A880 0%, #A87050 100%);
+  box-shadow: 0 8px 24px rgba(181, 124, 86, 0.5);
+  transform: translateY(-2px);
+}
+
+.floating-feedback-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(181, 124, 86, 0.3);
+}
+
+/* モバイル表示時のフローティングボタン */
+@media (max-width: 639px) {
+  .floating-feedback-button {
+    bottom: 16px;
+    right: 16px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+  }
+}
+
+/* 横向きモード */
+@media (max-height: 600px) and (orientation: landscape) {
+  .floating-feedback-button {
+    bottom: 12px;
+    right: 12px;
+    padding: 10px 14px;
+    font-size: 0.85rem;
+  }
+}
+

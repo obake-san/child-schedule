@@ -1,11 +1,63 @@
-/**
- * アプリケーション全体の定数
- */
+// =============================
+// アプリケーション全体の定数
+// =============================
 
-export const STORAGE_KEY = 'kodomo-schedule.children'
-export const FORM_STORAGE_KEY = 'kodomo-schedule.form'
-export const GROUP_ID_STORAGE_KEY = 'kodomo-schedule.groupId'
+// ローカルストレージキー
+export const STORAGE_KEY = 'kodomo-schedule.children';
+export const FORM_STORAGE_KEY = 'kodomo-schedule.form';
+export const GROUP_ID_STORAGE_KEY = 'kodomo-schedule.groupId';
 
+// カテゴリー順序（デフォルト）
+export const CATEGORY_ORDER = [
+  '行政手続き', '育児準備', '健康診断', '予防接種', '保育園',
+  '幼稚園', '生活・成長', '教育・発達', '入学準備', '学校関連', '行事・記念イベント'
+];
+
+// デフォルトフォームデータ
+export const DEFAULT_FORM = {
+  name: '',
+  birthDate: new Date().toISOString().slice(0, 10),
+  gender: 'male',
+  selectedCategories: [],
+  prefecture: '',
+  municipality: '',
+  title: '',
+  date: new Date().toISOString().slice(0, 10),
+  endDate: new Date().toISOString().slice(0, 10),
+  description: '',
+  category: '育児準備',
+  todos: [],
+  supplies: []
+};
+
+// 子どもフォームのデフォルト値
+export const DEFAULT_CHILD_FORM = {
+  name: '',
+  birthDate: new Date().toISOString().slice(0, 10),
+  gender: '',
+  prefecture: '',
+  municipality: '',
+  selectedCategories: []
+};
+
+// スケジュール編集フォームのデフォルト値
+export const INITIAL_EDIT_FORM = {
+  title: '',
+  date: '',
+  endDate: '',
+  description: '',
+  category: '育児準備',
+  todos: [],
+  supplies: []
+};
+
+// 初期フォーム（ユーティリティ関数）
+export const getInitialForm = () => ({
+  ...DEFAULT_FORM,
+  selectedCategories: [...CATEGORY_ORDER]
+});
+
+// 都道府県・市区町村データ
 export const PREFECTURES_MUNICIPALITIES = {
   北海道: ['札幌市', '函館市', '小樽市', '旭川市', '室蘭市', '釧路市', '帯広市', '北見市'],
   青森県: ['青森市', '弘前市', '八戸市'],
@@ -17,10 +69,24 @@ export const PREFECTURES_MUNICIPALITIES = {
   茨城県: ['水戸市', '日立市', '土浦市', '古河市', '石岡市'],
   栃木県: ['宇都宮市', '足利市', '栃木市', '佐野市'],
   群馬県: ['前橋市', '高崎市', '桐生市', '伊勢崎市'],
-  埼玉県: ['さいたま市', 'さいたま市中央区', 'さいたま市花見川区', '川越市', '熊谷市', '川口市'],
-  千葉県: ['千葉市', 'つくば市', '木更津市', '館山市', '野田市'],
-  東京都: ['千代田区', '中央区', 'チヨダ区', '港区', '新宿区', '文京区', '台東区', '墨田区', '江東区', '品川区', '目黒区', '大田区', '世田谷区', '渋谷区', '中野区', '杉並区', '豊島区', '北区', '荒川区', '板橋区', '練馬区', '足立区', '葛飾区', '江戸川区'],
-  神奈川県: ['横浜市', '川崎市', '横須賀市', '相模原市', '鎌倉市'],
+  東京都: [
+    '千代田区', '中央区', '港区', '新宿区', '文京区', '台東区', '墨田区', '江東区', '品川区', '目黒区', '大田区', '世田谷区', '渋谷区', '中野区', '杉並区', '豊島区', '北区', '荒川区', '板橋区', '練馬区', '足立区', '葛飾区', '江戸川区',
+    '八王子市', '立川市', '武蔵野市', '三鷹市', '青梅市', '府中市', '昭島市', '調布市', '町田市', '小金井市', '小平市', '日野市', '東村山市', '国分寺市', '国立市', '福生市', '狛江市', '東大和市', '清瀬市', '東久留米市', '武蔵村山市', '多摩市', '稲城市', '羽村市', 'あきる野市', '西東京市'
+  ],
+  神奈川県: [
+    '横浜市', '鶴見区', '神奈川区', '西区', '中区', '南区', '保土ケ谷区', '磯子区', '金沢区', '港北区', '戸塚区', '港南区', '旭区', '緑区（横浜市）', '瀬谷区', '栄区', '泉区', '青葉区', '都筑区',
+    '川崎市', '川崎区', '幸区', '中原区', '高津区', '多摩区', '宮前区', '麻生区',
+    '相模原市', '緑区（相模原市）', '中央区', '南区（相模原市）',
+    '横須賀市', '平塚市', '鎌倉市', '藤沢市', '小田原市', '茅ヶ崎市', '逗子市', '三浦市', '秦野市', '厚木市', '大和市', '伊勢原市', '海老名市', '座間市', '南足柄市', '綾瀬市'
+  ],
+  千葉県: [
+    '千葉市', '中央区', '花見川区', '稲毛区', '若葉区', '緑区', '美浜区',
+    '銚子市', '市川市', '船橋市', '館山市', '木更津市', '松戸市', '野田市', '茂原市', '成田市', '佐倉市', '東金市', '旭市', '習志野市', '柏市', '勝浦市', '市原市', '流山市', '八千代市', '我孫子市', '鴨川市', '鎌ケ谷市', '君津市', '富津市', '浦安市', '四街道市', '袖ケ浦市', '八街市', '印西市', '白井市', '富里市', '南房総市', '匝瑳市', '香取市', '山武市', 'いすみ市', '大網白里市'
+  ],
+  埼玉県: [
+    'さいたま市', '西区', '北区', '大宮区', '見沼区', '中央区', '桜区', '浦和区', '南区', '緑区', '岩槻区',
+    '川越市', '熊谷市', '川口市', '行田市', '秩父市', '所沢市', '飯能市', '加須市', '本庄市', '東松山市', '春日部市', '狭山市', '羽生市', '鴻巣市', '深谷市', '上尾市', '草加市', '越谷市', '蕨市', '戸田市', '入間市', '朝霞市', '志木市', '和光市', '新座市', '桶川市', '久喜市', '北本市', '八潮市', '富士見市', '三郷市', '蓮田市', '坂戸市', '幸手市', '鶴ヶ島市', '日高市', '吉川市', 'ふじみ野市', '白岡市'
+  ],
   新潟県: ['新潟市', '長岡市', '三条市', '柏崎市'],
   富山県: ['富山市', '高岡市', '魚津市'],
   石川県: ['金沢市', '七尾市', '小松市', '加賀市'],
@@ -54,32 +120,4 @@ export const PREFECTURES_MUNICIPALITIES = {
   宮崎県: ['宮崎市', '都城市', '延岡市'],
   鹿児島県: ['鹿児島市', '鹿屋市', '枕崎市'],
   沖縄県: ['那覇市', '宜野湾市', '石垣市', '浦添市'],
-}
-
-export const INITIAL_FORM = {
-  name: '',
-  birthDate: new Date().toISOString().slice(0, 10),
-  gender: '',
-  prefecture: '',
-  municipality: '',
-  selectedCategories: []
-}
-
-export const INITIAL_EDIT_FORM = {
-  title: '',
-  date: '',
-  endDate: '',
-  description: '',
-  category: '準備',
-  todos: [],
-  supplies: []
-}
-
-export const INITIAL_EDIT_CHILD_FORM = {
-  name: '',
-  birthDate: new Date().toISOString().slice(0, 10),
-  gender: '',
-  prefecture: '',
-  municipality: '',
-  selectedCategories: []
-}
+};

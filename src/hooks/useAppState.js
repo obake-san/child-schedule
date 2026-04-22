@@ -3,7 +3,7 @@
  */
 
 import { useState } from 'react'
-import { INITIAL_FORM, INITIAL_EDIT_FORM, INITIAL_EDIT_CHILD_FORM } from '../constants'
+import { getInitialForm, DEFAULT_CHILD_FORM, INITIAL_EDIT_FORM } from '../constants'
 
 /**
  * 子ども管理の状態
@@ -11,7 +11,7 @@ import { INITIAL_FORM, INITIAL_EDIT_FORM, INITIAL_EDIT_CHILD_FORM } from '../con
 export const useChildrenState = () => {
   const [children, setChildren] = useState([])
   const [editingChildId, setEditingChildId] = useState(null)
-  const [editChildForm, setEditChildForm] = useState(INITIAL_EDIT_CHILD_FORM)
+  const [editChildForm, setEditChildForm] = useState(DEFAULT_CHILD_FORM)
 
   return {
     children,
@@ -20,7 +20,7 @@ export const useChildrenState = () => {
     setEditingChildId,
     editChildForm,
     setEditChildForm,
-    resetEditChildForm: () => setEditChildForm(INITIAL_EDIT_CHILD_FORM)
+    resetEditChildForm: () => setEditChildForm(DEFAULT_CHILD_FORM)
   }
 }
 
@@ -28,18 +28,38 @@ export const useChildrenState = () => {
  * フォーム管理の状態
  */
 export const useFormState = () => {
-  const [form, setForm] = useState(INITIAL_FORM)
+  const [form, setForm] = useState(getInitialForm)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({
+    name: '',
+    birthDate: '',
+    prefecture: '',
+    municipality: '',
+    selectedCategories: ''
+  })
   const [saveSuccess, setSaveSuccess] = useState(false)
+
+  const clearFieldErrors = () => {
+    setFieldErrors({
+      name: '',
+      birthDate: '',
+      prefecture: '',
+      municipality: '',
+      selectedCategories: ''
+    })
+  }
 
   return {
     form,
     setForm,
     error,
     setError,
+    fieldErrors,
+    setFieldErrors,
+    clearFieldErrors,
     saveSuccess,
     setSaveSuccess,
-    resetForm: () => setForm(INITIAL_FORM),
+    resetForm: () => setForm(getInitialForm()),
     showError: (message) => {
       setError(message)
       setTimeout(() => setError(''), 3000)

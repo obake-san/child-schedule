@@ -79,84 +79,77 @@ export const validateUUID = (groupId) => {
 
 /**
  * スケジュール ID を検証
- * @param {string} id - スケジュールID
- * @returns {boolean} 有効な場合 true
+ * 未使用: 現在のアーキテクチャでは必要ない
  */
-export const validateScheduleId = (id) => {
-  return typeof id === 'string' && id.length > 0 && id.length <= 200
-}
+// export const validateScheduleId = (id) => {
+//   return typeof id === 'string' && id.length > 0 && id.length <= 200
+// }
 
 /**
  * 安全な整数値を取得
- * @param {*} value - 値
- * @param {number} defaultValue - デフォルト値
- * @returns {number} 整数値
+ * 未使用: 現在のアーキテクチャでは必要ない
  */
-export const getSafeInteger = (value, defaultValue = 0) => {
-  const num = parseInt(value, 10)
-  return isNaN(num) ? defaultValue : num
-}
+// export const getSafeInteger = (value, defaultValue = 0) => {
+//   const num = parseInt(value, 10)
+//   return isNaN(num) ? defaultValue : num
+// }
 
 /**
  * 危険な文字列をマスク
- * @param {string} str - 文字列
- * @param {number} visibleChars - 表示文字数
- * @returns {string} マスクされた文字列
+ * 未使用: 現在のアーキテクチャでは必要ない
  */
-export const maskSensitiveData = (str, visibleChars = 4) => {
-  if (!str || typeof str !== 'string') return ''
-  if (str.length <= visibleChars) return '*'.repeat(str.length)
-  return str.substring(0, visibleChars) + '*'.repeat(str.length - visibleChars)
-}
+// export const maskSensitiveData = (str, visibleChars = 4) => {
+//   if (!str || typeof str !== 'string') return ''
+//   if (str.length <= visibleChars) return '*'.repeat(str.length)
+//   return str.substring(0, visibleChars) + '*'.repeat(str.length - visibleChars)
+// }
 
 /**
  * CSRF トークン用のランダム文字列生成
- * @returns {string} トークン
+ * 未使用: 現在のアーキテクチャでは必要ない
  */
-export const generateCsrfToken = () => {
-  return Array.from(crypto.getRandomValues(new Uint8Array(32)))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('')
-}
+// export const generateCsrfToken = () => {
+//   return Array.from(crypto.getRandomValues(new Uint8Array(32)))
+//     .map(b => b.toString(16).padStart(2, '0'))
+//     .join('')
+// }
 
 /**
  * ローカルストレージへのアクセスが安全か確認
- * @returns {boolean} 使用可能な場合 true
+ * 未使用: 現在のアーキテクチャでは必要ない
  */
-export const isLocalStorageAvailable = () => {
-  try {
-    const test = '__storage_test__'
-    localStorage.setItem(test, test)
-    localStorage.removeItem(test)
-    return true
-  } catch {
-    return false
-  }
-}
+// export const isLocalStorageAvailable = () => {
+//   try {
+//     const test = '__storage_test__'
+//     localStorage.setItem(test, test)
+//     localStorage.removeItem(test)
+//     return true
+//   } catch {
+//     return false
+//   }
+// }
 
 /**
  * セッションストレージにトークンを安全に保存
- * @param {string} key - キー
- * @param {string} token - トークン
+ * 未使用: 現在のアーキテクチャでは必要ない
  */
-export const storeSecureToken = (key, token) => {
-  try {
-    sessionStorage.setItem(key, token)
-  } catch (error) {
-    console.error('セッションストレージへの保存に失敗:', error)
-  }
-}
+// export const storeSecureToken = (key, token) => {
+//   try {
+//     sessionStorage.setItem(key, token)
+//   } catch (error) {
+//     console.error('セッションストレージへの保存に失敗:', error)
+//   }
+// }
 
 /**
  * セッションストレージからトークンを取得
- * @param {string} key - キー
- * @returns {string|null} トークン
+ * 未使用: 現在のアーキテクチャでは必要ない
  */
-export const getSecureToken = (key) => {
-  try {
-    return sessionStorage.getItem(key)
-  } catch (error) {
-    console.error('セッションストレージからの取得に失敗:', error)
-    return null
-  }
-}
+// export const getSecureToken = (key) => {
+//   try {
+//     return sessionStorage.getItem(key)
+//   } catch (error) {
+//     console.error('セッションストレージからの取得に失敗:', error)
+//     return null
+//   }
+// }

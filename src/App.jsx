@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState, useRef } from 'react'
 import { ChildCalendar } from './components/ChildCalendar'
 import { Footer } from './components/Footer'
 import { PolicyModal } from './components/PolicyModal'
-import { generateSchedule, formatDate, formatRange, groupScheduleByMonth, groupScheduleByWeek, isHoliday, getAvailableCategories, getCategoryIndex, calculateAge } from './lib/schedule.js'
+import { generateSchedule, isHoliday, getAvailableCategories, getCategoryIndex, formatDate, calculateAge, formatRange } from './lib/schedule.js'
 import { getLocalSchedules } from './lib/localSchedules.js'
-import { initializeFirebase, saveDataToFirebase, listenToData, checkAndDeleteOldData, updateLastAccessedAt, deleteDataFromFirebase, listenToStatistics, initializeStatistics, incrementUserCount, incrementChildCount, getDataFromFirebase } from './firebase'
+import { saveDataToFirebase, listenToData, checkAndDeleteOldData, updateLastAccessedAt, deleteDataFromFirebase, listenToStatistics, initializeStatistics, incrementUserCount, incrementChildCount, getDataFromFirebase } from './firebase'
 import { sanitizeInput, sanitizeObject, validateLength, validateDate, validateUUID } from './utils/security'
 import { useDeviceType } from './utils/responsive'
-import { STORAGE_KEY, FORM_STORAGE_KEY, GROUP_ID_STORAGE_KEY, PREFECTURES_MUNICIPALITIES, INITIAL_FORM, INITIAL_EDIT_FORM, INITIAL_EDIT_CHILD_FORM } from './constants'
+import { STORAGE_KEY, FORM_STORAGE_KEY, GROUP_ID_STORAGE_KEY, PREFECTURES_MUNICIPALITIES, INITIAL_EDIT_FORM, getInitialForm, CATEGORY_ORDER } from './constants'
 import { useChildrenState, useFormState, useScheduleEditState, useUIState } from './hooks/useAppState'
 import { createNewChild, confirmDeleteChild, validateChildEdit, updateChildInfo, validateScheduleForm, createNewSchedule, saveToLocalStorage, exportDataAsJSON, getScheduleFormDefaults, generateShareUrl, copyShareUrlToClipboard, decompressShareData } from './utils/handlers'
 import { downloadCalendarFile } from './utils/calendar'
@@ -19,7 +19,7 @@ function App() {
   
   // Custom hooks for state management
   const { children, setChildren, editingChildId, setEditingChildId, editChildForm, setEditChildForm, resetEditChildForm } = useChildrenState()
-  const { form, setForm, error, setError, saveSuccess, setSaveSuccess, resetForm, showError, showSuccess } = useFormState()
+  const { form, setForm, error, setError, fieldErrors, setFieldErrors, clearFieldErrors, saveSuccess, setSaveSuccess, resetForm, showError, showSuccess } = useFormState()
   const { editingSchedule, setEditingSchedule, editForm, setEditForm, addingSchedule, setAddingSchedule, selectedChildrenForSchedule, setSelectedChildrenForSchedule, resetEditForm, closeEditor } = useScheduleEditState()
   const { viewMode, setViewMode, groupId, setGroupId, selectedChildIds, setSelectedChildIds, currentCombinedMonth, setCurrentCombinedMonth, resetUI } = useUIState()
   
@@ -36,7 +36,7 @@ function App() {
     date: today,
     endDate: today,
     description: '',
-    category: '準備',
+    category: '育児準備',
     todos: [],
     supplies: []
   })
@@ -99,29 +99,14 @@ function App() {
           setForm(sharedData.form)
         }
       } else {
-        // Firebase が起動するまで、ローカルストレージから初期データを読み込む
-        const stored = window.localStorage.getItem(STORAGE_KEY)
-        if (stored) {
-          try {
-            const parsed = JSON.parse(stored)
-            const migratedChildren = parsed.map(child => ({
-              ...child,
-              excludedScheduleIds: child.excludedScheduleIds || []
-            }))
-            setChildren(migratedChildren)
-          } catch (error) {
-            // パースエラー（コンソール抑制中）
-          }
-        }
-
-        // formを読み込む
+        // 共有データなし → localStorage から form を読み込む
         const storedForm = window.localStorage.getItem(FORM_STORAGE_KEY)
         if (storedForm) {
           try {
             const parsedForm = JSON.parse(storedForm)
             setForm(parsedForm)
           } catch (error) {
-            // パースエラー（コンソール抑制中）
+            console.error('form パースエラー:', error)
           }
         }
       }
@@ -156,11 +141,10 @@ function App() {
   useEffect(() => {
     if (!groupId) return // groupId がなければ待機
     
+    let unsubscribe = null
+    
     const setupFirebase = async () => {
       try {
-        // Firebase を初期化
-        await initializeFirebase()
-        
         const wasDeleted = await checkAndDeleteOldData(groupId)
         if (wasDeleted) {
           // ローカルストレージもクリア
@@ -169,14 +153,14 @@ function App() {
           const userCountKey = `userCountIncremented_${groupId}`
           window.localStorage.removeItem(userCountKey)
           setChildren([])
-          setForm(INITIAL_FORM)
+          setForm(getInitialForm())
           return
         }
         
         // Firebase からのリアルタイムリスニングを開始（groupId を使用）
-        listenToData(groupId, (firebaseData) => {
+        unsubscribe = listenToData(groupId, (firebaseData) => {
           
-          // ⚠️ 空配列は falsy なので、Array.isArray だけでチェック
+          // 空配列は falsy なので、Array.isArray だけでチェック
           if (Array.isArray(firebaseData.children)) {
             setChildren(firebaseData.children)
           } else {
@@ -196,54 +180,14 @@ function App() {
     }
     
     setupFirebase()
-  }, [groupId])
-
-  const prevDataRef = useRef(null)
-
-  // データが変更されたときに localStorage と Firebase に自動保存
-  useEffect(() => {
-    try {
-      // Firebase からの更新時の無限ループを防ぐため、データが本当に変わったかチェック
-      const currentData = JSON.stringify({ children, form })
-      if (prevDataRef.current === currentData) {
-        return // 変わっていなければ保存しない
+    
+    // useEffect のクリーンアップ関数
+    return () => {
+      if (unsubscribe) {
+        unsubscribe()
       }
-      prevDataRef.current = currentData
-
-      // ローカルストレージに保存
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(children))
-      window.localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(form))
-      
-      // Firebase に保存（グループIDを使用）
-      if (groupId) {
-        // グループの初回保存かどうかを判定
-        const userCountKey = `userCountIncremented_${groupId}`
-        const alreadyIncremented = window.localStorage.getItem(userCountKey) === 'true'
-        
-        // 子どもがいて、かつまだカウントしていない場合
-        if (Array.isArray(children) && children.length > 0 && !alreadyIncremented) {
-          // 先に DB に存在するかチェック
-          getDataFromFirebase(groupId).then((existingData) => {
-            if (!existingData) {
-              // DB に存在しない新規グループなので、利用者カウント
-              incrementUserCount()
-            }
-            // フラグを保存（既存グループでもカウント済みフラグ保存）
-            window.localStorage.setItem(userCountKey, 'true')
-          })
-        }
-        
-        saveDataToFirebase(groupId, { children, form }).then((result) => {
-          // Firebase 保存成功後、アクセス日時を更新
-          updateLastAccessedAt(groupId)
-        }).catch(err => {
-          console.warn('Firebase 保存失敗（ローカルストレージは保存済）:', err.message)
-        })
-      }
-    } catch (error) {
-      console.error('データ保存エラー:', error)
     }
-  }, [children, form, groupId])
+  }, [groupId])
 
   const summary = useMemo(() => {
     return children.map((child) => {
@@ -346,32 +290,42 @@ function App() {
 
   const handleSubmit = (event) => {
     event.preventDefault()
+    clearFieldErrors()
     
     // 入力値の検証とサニタイゼーション
     const name = form.name.trim()
+    let hasError = false
+
     if (!name || !validateLength(name, 100)) {
-      setError('名前は1文字以上100文字以下で入力してください。')
-      return
+      setFieldErrors(prev => ({ ...prev, name: '名前かニックネームを入力してください。' }))
+      hasError = true
     }
     
     if (!form.birthDate || !validateDate(form.birthDate)) {
-      setError('正しい生年月日を入力してください。')
-      return
+      setFieldErrors(prev => ({ ...prev, birthDate: '正しい生年月日を入力してください。' }))
+      hasError = true
     }
     
     if (!form.prefecture || !validateLength(form.prefecture, 50)) {
-      setError('有効な都道府県を選択してください。')
-      return
+      setFieldErrors(prev => ({ ...prev, prefecture: '住んでいる都道府県を選択してください。' }))
+      hasError = true
     }
     
     if (!form.municipality || !validateLength(form.municipality, 100)) {
-      setError('有効な市町村を選択してください。')
-      return
+      setFieldErrors(prev => ({ ...prev, municipality: '住んでいる市町村を選択してください。' }))
+      hasError = true
     }
+
+    if (form.selectedCategories.length === 0) {
+      setFieldErrors(prev => ({ ...prev, selectedCategories: '追加するスケジュールを選択してください。' }))
+      hasError = true
+    }
+
+    if (hasError) return
 
     const birthDate = new Date(form.birthDate)
     if (Number.isNaN(birthDate.getTime())) {
-      setError('正しい日付を入力してください。')
+      setFieldErrors(prev => ({ ...prev, birthDate: '正しい日付を入力してください。' }))
       return
     }
 
@@ -382,21 +336,61 @@ function App() {
       gender: sanitizeInput(form.gender),
       prefecture: sanitizeInput(form.prefecture),
       municipality: sanitizeInput(form.municipality),
-      selectedCategories: form.selectedCategories.length > 0 ? form.selectedCategories : getAvailableCategories(),
+      selectedCategories: form.selectedCategories,
       customSchedules: [],
       excludedScheduleIds: []
     }
     
-    setChildren((current) => {
-      const updated = [...current, newChild]
-      return updated
-    })
-    
-    // 統計情報に子ども数をカウント
-    incrementChildCount()
-    
-    // フォームの内容を全て保持
-    setError('')
+    const updatedChildren = [...children, newChild]
+
+    setChildren(updatedChildren)
+
+    // ローカルストレージにも保存
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedChildren))
+      window.localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(form))
+    } catch (error) {
+      console.error('ローカルストレージの保存エラー:', error)
+    }
+
+    // Firebase に保存
+    if (groupId) {
+      saveDataToFirebase(groupId, { children: updatedChildren, form }).then(() => {
+        // 初回保存時のカウント処理
+        const userCountKey = `userCountIncremented_${groupId}`
+        const alreadyIncremented = window.localStorage.getItem(userCountKey) === 'true'
+
+        if (!alreadyIncremented) {
+          // 先に DB に存在するかチェック
+          getDataFromFirebase(groupId).then((existingData) => {
+            if (!existingData) {
+              // DB に存在しない新規グループなので、利用者カウント
+              incrementUserCount()
+            }
+            window.localStorage.setItem(userCountKey, 'true')
+          })
+        }
+
+        // 子ども数をカウント
+        incrementChildCount()
+
+        // フォームをリセット
+        setForm(getInitialForm())
+        clearFieldErrors()
+        showSuccess()
+      }).catch((error) => {
+        console.error('Firebase save error:', error)
+        showError('データの保存に失敗しました。もう一度お試しください。')
+      })
+    } else {
+      // Firebase なし（ローカルのみ）
+      incrementChildCount()
+      
+      // フォームをリセット
+      setForm(getInitialForm())
+      clearFieldErrors()
+      showSuccess()
+    }
   }
 
   const removeChild = (id) => {
@@ -406,17 +400,27 @@ function App() {
     const updatedChildren = children.filter((child) => child.id !== id)
     setChildren(updatedChildren)
     
-    // 子どもが全員削除された場合、DBからグループを削除
-    if (updatedChildren.length === 0) {
-      try {
-        deleteDataFromFirebase(groupId)
-      } catch (error) {
-        console.error('Failed to delete group from Firebase:', error)
+    // Firebase に保存
+    if (groupId) {
+      if (updatedChildren.length === 0) {
+        // 子どもが全員削除された場合、DBからグループを削除
+        try {
+          deleteDataFromFirebase(groupId)
+        } catch (error) {
+          console.error('Failed to delete group from Firebase:', error)
+        }
+      } else {
+        // 子どもが残っている場合は更新を保存
+        saveDataToFirebase(groupId, { children: updatedChildren, form }).catch((error) => {
+          console.error('Firebase save error:', error)
+        })
       }
     }
   }
 
   const openEditChild = (child) => {
+    setError('')
+    clearFieldErrors()
     setEditingChildId(child.id)
     setEditChildForm({
       name: child.name,
@@ -429,6 +433,8 @@ function App() {
   }
 
   const closeEditChild = () => {
+    setError('')
+    clearFieldErrors()
     setEditingChildId(null)
     setEditChildForm({
       name: '',
@@ -453,7 +459,7 @@ function App() {
       date: new Date().toISOString().slice(0, 10),
       endDate: new Date().toISOString().slice(0, 10),
       description: '',
-      category: '準備',
+      category: '育児準備',
       todos: [],
       supplies: []
     })
@@ -476,17 +482,20 @@ function App() {
       return
     }
 
+    // 複数の子どもで共有するID
+    const sharedScheduleId = crypto.randomUUID()
+
     const updatedChildren = children.map((child) => {
       if (!selectedChildrenForSchedule.includes(child.id)) return child
 
       const customSchedules = Array.isArray(child.customSchedules) ? [...child.customSchedules] : []
       const newSchedule = {
-        id: crypto.randomUUID(),
+        id: sharedScheduleId,
         title: addScheduleForm.title.trim(),
         date: addScheduleForm.date,
         endDate: addScheduleForm.endDate || addScheduleForm.date,
         description: addScheduleForm.description || '',
-        category: addScheduleForm.category || '準備',
+        category: addScheduleForm.category || '育児準備',
         todos: Array.isArray(addScheduleForm.todos) ? addScheduleForm.todos.filter(t => t && t.trim()) : [],
         supplies: Array.isArray(addScheduleForm.supplies) ? addScheduleForm.supplies.filter(s => s && s.trim()) : []
       }
@@ -497,6 +506,14 @@ function App() {
 
     setChildren(updatedChildren)
     
+    // Firebase に保存
+    if (groupId) {
+      saveDataToFirebase(groupId, { children: updatedChildren, form }).catch((error) => {
+        console.error('Firebase save error:', error)
+        alert('スケジュール保存エラーが発生しました。')
+      })
+    }
+    
     // ローカルストレージに自動保存
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedChildren))
@@ -506,7 +523,7 @@ function App() {
       // スケジュール追加成功を通知
       const selectedChildren = updatedChildren.filter(c => selectedChildrenForSchedule.includes(c.id))
       const childNames = selectedChildren.map(c => c.name).join('、')
-      alert(`✓ スケジュール「${addScheduleForm.title}」を${childNames}に登録しました。`)
+      alert(`スケジュール「${addScheduleForm.title}」を${childNames}に登録しました。`)
     } catch (error) {
       console.error('ローカルストレージの保存エラー:', error)
       alert('スケジュール保存エラーが発生しました。')
@@ -516,27 +533,37 @@ function App() {
   }
 
   const saveChildEdit = () => {
+    clearFieldErrors()
     
     const name = editChildForm.name.trim()
+    let hasError = false
+
     if (!name || !validateLength(name, 100)) {
-      setError('名前は1文字以上100文字以下で入力してください。')
-      return
+      setFieldErrors(prev => ({ ...prev, name: '名前かニックネームを入力してください。' }))
+      hasError = true
     }
     
     if (!editChildForm.birthDate || !validateDate(editChildForm.birthDate)) {
-      setError('正しい生年月日を入力してください。')
-      return
+      setFieldErrors(prev => ({ ...prev, birthDate: '正しい生年月日を入力してください。' }))
+      hasError = true
     }
     
     if (!editChildForm.prefecture || !validateLength(editChildForm.prefecture, 50)) {
-      setError('有効な都道府県を選択してください。')
-      return
+      setFieldErrors(prev => ({ ...prev, prefecture: '住んでいる都道府県を選択してください。' }))
+      hasError = true
     }
     
     if (!editChildForm.municipality || !validateLength(editChildForm.municipality, 100)) {
-      setError('有効な市町村を選択してください。')
-      return
+      setFieldErrors(prev => ({ ...prev, municipality: '住んでいる市町村を選択してください。' }))
+      hasError = true
     }
+
+    if (editChildForm.selectedCategories.length === 0) {
+      setFieldErrors(prev => ({ ...prev, selectedCategories: '追加するスケジュールを選択してください。' }))
+      hasError = true
+    }
+
+    if (hasError) return
 
     const updatedChildren = children.map((child) => {
       if (child.id !== editingChildId) return child
@@ -559,13 +586,43 @@ function App() {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedChildren))
       window.localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(form))
-      setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 2000)
     } catch (error) {
       console.error('ローカルストレージの保存エラー:', error)
     }
 
-    setError('')
+    // Firebase に保存
+    if (groupId) {
+      saveDataToFirebase(groupId, { children: updatedChildren, form }).then(() => {
+        // 初回保存時のカウント処理
+        const userCountKey = `userCountIncremented_${groupId}`
+        const alreadyIncremented = window.localStorage.getItem(userCountKey) === 'true'
+        
+        if (!alreadyIncremented) {
+          // 先に DB に存在するかチェック
+          getDataFromFirebase(groupId).then((existingData) => {
+            if (!existingData) {
+              // DB に存在しない新規グループなので、利用者カウント
+              incrementUserCount()
+            }
+            // フラグを保存（既存グループでもカウント済みフラグ保存）
+            window.localStorage.setItem(userCountKey, 'true')
+          })
+        }
+        
+        // アクセス日時を更新
+        updateLastAccessedAt(groupId)
+        
+        setSaveSuccess(true)
+        setTimeout(() => setSaveSuccess(false), 2000)
+      }).catch((error) => {
+        console.error('Firebase保存エラー:', error)
+      })
+    } else {
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 2000)
+    }
+
+    clearFieldErrors()
     closeEditChild()
   }
 
@@ -660,10 +717,10 @@ function App() {
     const now = new Date()
     let icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//子供のスケジュール//
+PRODID:-//楽々キッズかれんだぁ//
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
-X-WR-CALNAME:子供のスケジュール
+X-WR-CALNAME:楽々キッズかれんだぁ
 X-WR-TIMEZONE:Asia/Tokyo
 BEGIN:VTIMEZONE
 TZID:Asia/Tokyo
@@ -717,7 +774,7 @@ END:VEVENT
     const element = document.createElement('a')
     const file = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' })
     element.href = URL.createObjectURL(file)
-    element.download = `子供のスケジュール_${new Date().toISOString().slice(0, 10)}.ics`
+    element.download = `楽々キッズかれんだぁ_${new Date().toISOString().slice(0, 10)}.ics`
     document.body.appendChild(element)
     element.click()
     document.body.removeChild(element)
@@ -776,7 +833,7 @@ END:VEVENT
           }
           
           if (schedule.todos && Array.isArray(schedule.todos) && schedule.todos.length > 0) {
-            details += `\n\n【Todoリスト】`
+            details += `\n\n【やることリスト】`
             schedule.todos.forEach(todo => {
               details += `\n・${todo}`
             })
@@ -819,7 +876,7 @@ END:VEVENT
 
       if (failCount > 0) {
         alert(
-          `✓ 処理完了\n\n` +
+          `処理完了\n\n` +
           `開かれたウィンドウ: ${successCount}件\n` +
           `ブロックされたウィンドウ: ${failCount}件\n\n` +
           `各ウィンドウで「保存」をクリック後、ウィンドウを手動で閉じてください。\n` +
@@ -827,7 +884,8 @@ END:VEVENT
         )
       } else {
         alert(
-          `✓ ${totalSchedules}件のスケジュール登録ウィンドウを開きました。\n\n` +
+          `` +
+          `${totalSchedules}件のスケジュール登録ウィンドウを開きました。\n\n` +
           `【操作手順】\n` +
           `1. 各ウィンドウで「保存」をクリック\n` +
           `2. ウィンドウを手動で閉じる\n` +
@@ -860,7 +918,7 @@ END:VEVENT
       date: '',
       endDate: '',
       description: '',
-      category: '準備',
+      category: '育児準備',
       todos: [],
       supplies: []
     })
@@ -920,7 +978,7 @@ END:VEVENT
         date: editForm.date,
         endDate: editForm.endDate,
         description: sanitizeInput(editForm.description || ''),
-        category: sanitizeInput(editForm.category || '準備'),
+        category: sanitizeInput(editForm.category || '育児準備'),
         todos: Array.isArray(editForm.todos) ? editForm.todos.map(t => sanitizeInput(t)) : [],
         supplies: Array.isArray(editForm.supplies) ? editForm.supplies.map(s => sanitizeInput(s)) : []
       }
@@ -950,6 +1008,14 @@ END:VEVENT
     })
 
     setChildren(updatedChildren)
+    
+    // Firebase に保存
+    if (groupId) {
+      saveDataToFirebase(groupId, { children: updatedChildren, form }).catch((error) => {
+        console.error('Firebase save error:', error)
+        setError('データの保存に失敗しました。もう一度お試しください。')
+      })
+    }
     
     // ローカルストレージに自動保存
     try {
@@ -1010,6 +1076,14 @@ END:VEVENT
 
     setChildren(updatedChildren)
     
+    // Firebase に保存
+    if (groupId) {
+      saveDataToFirebase(groupId, { children: updatedChildren, form }).catch((error) => {
+        console.error('Firebase save error:', error)
+        setError('データの保存に失敗しました。もう一度お試しください。')
+      })
+    }
+    
     // ローカルストレージに自動保存
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedChildren))
@@ -1026,21 +1100,21 @@ END:VEVENT
     <div className="app-shell">
       <header className="hero">
         <div>
-          <p className="eyebrow">現役パパが考えた、子育てを楽にするスケジュール管理</p>
-          <h1>子供スケジュール</h1>
+          <p className="eyebrow">現役パパが使いたいから作った</p>
+          <h1>楽々キッズかれんだぁ</h1>
           <p className="description">
-            役所手続き、予防接種、保育園準備まで。子どもごとに必要なスケジュールを一目で確認できます。
+            手続き、ワクチン、保育園…育児の『やること』を、子どもごとに全部見える化。
             <br />
-            <small>※ 本アプリで表示されるスケジュールはあくまで目安です。実際の手続きや予防接種日程は児童福祉施設や保健サービスの指示に従ってください。</small>
+            <small>※ 表示されるスケジュールは目安です。実際の手続き・ワクチンは、役所や医師の最新情報を確認してね。</small>
           </p>
           <div className="statistics">
             <div className="count-up-item">
               <div className="count-up-number">{(statistics.userCount || 0).toLocaleString('ja-JP')}</div>
-              <div className="count-up-label">利用者</div>
+              <div className="count-up-label">登録してくれた家族</div>
             </div>
             <div className="count-up-item">
               <div className="count-up-number">{(statistics.totalChildren || 0).toLocaleString('ja-JP')}</div>
-              <div className="count-up-label">登録された子ども</div>
+              <div className="count-up-label">登録済みの子どもたち</div>
             </div>
           </div>
         </div>
@@ -1048,20 +1122,21 @@ END:VEVENT
 
       <main>
         <section className="panel">
-          <h2>子供を登録する</h2>
+          <h2>子どもを追加</h2>
           <form className="input-form" onSubmit={handleSubmit}>
             <label>
-              名前（ニックネーム可）
+              名前（ニックネーム）
               <input
                 id="child-name"
                 name="name"
                 type="text"
                 value={form.name}
                 onChange={(event) => setForm({ ...form, name: event.target.value })}
-                placeholder="例: はなこ"
+                placeholder="例: たろう"
                 autoComplete="name"
               />
             </label>
+            {fieldErrors.name && <p className="form-error">{fieldErrors.name}</p>}
 
             <label>
               生年月日
@@ -1074,6 +1149,7 @@ END:VEVENT
                 autoComplete="off"
               />
             </label>
+            {fieldErrors.birthDate && <p className="form-error">{fieldErrors.birthDate}</p>}
 
             <label>
               性別
@@ -1089,13 +1165,15 @@ END:VEVENT
             </label>
 
             <label>
-              居住地（都道府県）
+              住んでいる都道府県
               <select
                 id="child-prefecture"
                 name="prefecture"
                 value={form.prefecture}
                 onChange={(event) => {
                   const prefecture = event.target.value
+                  // デバッグ用: 選択した都道府県と市町村リストを出力
+                  console.log('都道府県:', prefecture, '市町村リスト:', PREFECTURES_MUNICIPALITIES[prefecture])
                   setForm({ ...form, prefecture, municipality: '' })
                 }}
                 autoComplete="off"
@@ -1108,30 +1186,50 @@ END:VEVENT
                 ))}
               </select>
             </label>
+            {fieldErrors.prefecture && <p className="form-error">{fieldErrors.prefecture}</p>}
 
             {String(form.prefecture).length > 0 ? (
-              <label>
-                居住地（市町村）
-                <select
-                  id="child-municipality"
-                  name="municipality"
-                  value={form.municipality}
-                  onChange={(event) => setForm({ ...form, municipality: event.target.value })}
-                  autoComplete="off"
-                >
-                  <option value="">選択してください</option>
-                {PREFECTURES_MUNICIPALITIES[form.prefecture] && PREFECTURES_MUNICIPALITIES[form.prefecture].map((city) => (
-                    <option key={city} value={city}>
-                      {city}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <>
+                <label>
+                  住んでいる市町村
+                  <select
+                    id="child-municipality"
+                    name="municipality"
+                    value={form.municipality}
+                    onChange={(event) => setForm({ ...form, municipality: event.target.value })}
+                    autoComplete="off"
+                  >
+                    <option value="">選択してください</option>
+                  {PREFECTURES_MUNICIPALITIES[form.prefecture] && PREFECTURES_MUNICIPALITIES[form.prefecture].map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {fieldErrors.municipality && <p className="form-error">{fieldErrors.municipality}</p>}
+              </>
             ) : null}
 
             <fieldset className="category-fieldset">
-              <legend>表示するスケジュールのカテゴリ（選択なしで全て表示）</legend>
+              <legend>追加するスケジュール</legend>
               <div className="category-checkboxes">
+                <label className="category-checkbox category-checkbox-all">
+                  <input
+                    id="category-select-all"
+                    name="category-select-all"
+                    type="checkbox"
+                    checked={(form.selectedCategories || []).length === availableCategories.length && availableCategories.length > 0}
+                    onChange={(event) => {
+                      const { checked } = event.target
+                      setForm((prev) => ({
+                        ...prev,
+                        selectedCategories: checked ? availableCategories : []
+                      }))
+                    }}
+                  />
+                  <span>全選択</span>
+                </label>
                 {availableCategories.map((category) => (
                   <label key={category} className="category-checkbox">
                     <input
@@ -1154,20 +1252,20 @@ END:VEVENT
                 ))}
               </div>
             </fieldset>
+            {fieldErrors.selectedCategories && <p className="form-error">{fieldErrors.selectedCategories}</p>}
 
-            <button type="submit">登録してスケジュールを見る</button>
-            {error ? <p className="form-error">{error}</p> : null}
+            <button type="submit">スケジュール管理開始</button>
           </form>
         </section>
 
         <section className="panel">
           <div className="section-header">
             <div>
-              <h2>登録済みの子供</h2>
+              <h2>登録済みの子ども</h2>
             </div>
           </div>
           {children.length === 0 ? (
-            <p className="empty-state">まだ子供が登録されていません。上のフォームから追加してください。</p>
+            <p className="empty-state">まだ子どもが登録されていません。上のフォームから追加してください。</p>
           ) : (
             <div className="combined-children-info">
               {children.map((child) => (
@@ -1206,7 +1304,7 @@ END:VEVENT
           <section className="panel">
             <div className="section-header">
               <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                <h2 style={{ margin: 0 }}>Todo</h2>
+                <h2 style={{ margin: 0 }}>やることリスト</h2>
                 <button className="add-schedule-button" onClick={openScheduleAdder}>
                   + 追加
                 </button>
@@ -1218,7 +1316,7 @@ END:VEVENT
                     className={viewMode === 'list' ? 'active' : ''}
                     onClick={() => setViewMode('list')}
                   >
-                    Todo
+                    やることリスト
                   </button>
                   <button
                     type="button"
@@ -1324,7 +1422,7 @@ END:VEVENT
                     className={viewMode === 'list' ? 'active' : ''}
                     onClick={() => setViewMode('list')}
                   >
-                    Todo
+                    やることリスト
                   </button>
                   <button
                     type="button"
@@ -1393,16 +1491,20 @@ END:VEVENT
         )}
 
         <section className="panel save-section">
-          <h2>データ管理</h2>
+          <div className="section-header">
+            <div>
+              <h2>データ管理</h2>
+            </div>
+          </div>
           <div className="save-buttons-group">
             <button className="save-button export-button" onClick={() => openShareModal()}>
               URLで共有
             </button>
-            <button className="save-button export-button" onClick={registerToGoogleCalendar} style={{ backgroundColor: '#1F2937' }}>
+            <button className="save-button export-button" onClick={registerToGoogleCalendar}>
               Googleカレンダーに登録
             </button>
             <button className="save-button export-button" onClick={exportData}>
-              データをエクスポート
+              スケジュールデータをダウンロード
             </button>
             <label className="import-button-label">
               <input
@@ -1413,27 +1515,23 @@ END:VEVENT
                 onChange={importData}
                 style={{ display: 'none' }}
               />
-              データをインポート
+              スケジュールデータを読み込み
             </label>
           </div>
-          {saveSuccess && <p className="save-success">✓ データを保存しました</p>}
-          <p className="data-policy" style={{ fontSize: '0.9rem', color: '#666', marginTop: '16px', lineHeight: '1.6' }}>
-            ℹ️ <strong>データ保持について：</strong>
+          {saveSuccess && <p className="save-success">データを保存しました</p>}
+          <p className="data-policy" style={{ fontSize: '0.9rem', color: '#666', marginTop: '16px', lineHeight: '1.6', textAlign: 'left' }}>
+            <strong>データ保持について：</strong>
             <br />
-            本アプリのデータは1年間保持されます。1年以上アクセスがない場合、データは自動的に削除されます。
+            データは1年間保存されます。
             <br />
-            1年以上アプリを使用する予定がない場合は、事前に「データをエクスポート」でバックアップを取ることをお勧めします。
+            その後は自動で削除されるので、使わなくなったら『スケジュールデータをダウンロード』で記録を残しておくことをお勧めします。
             <br />
             <br />
-            ⚠️ <strong>重要：ブラウザのキャッシュ削除について：</strong>
+            <strong>ブラウザ削除時の注意：</strong>
             <br />
-            本アプリのデータへのアクセスIDはブラウザのキャッシュに保存されています。
+            このアプリへのアクセスIDはブラウザ内に保存されています。
             <br />
-            ブラウザのキャッシュやクッキーを削除すると、ID情報も削除され、データを呼び出すことができなくなります。
-            <br />
-            ブラウザのキャッシュを削除する前に、必ず「URLで共有」ボタンからURLを控えてください。
-            <br />
-            その URLを使えば、削除後でも同じデータにアクセスできます。
+            ブラウザをクリアするとID情報が消えてアクセスできなくなります。『URLで共有』でURLを保存しておけば、いつでも復帰できます。
           </p>
         </section>
       </main>
@@ -1494,12 +1592,9 @@ END:VEVENT
                     onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                     autoComplete="off"
                   >
-                    <option value="手続き">手続き</option>
-                    <option value="予防接種">予防接種</option>
-                    <option value="保育園">保育園</option>
-                    <option value="準備">準備</option>
-                    <option value="行事">行事</option>
-                    <option value="入学準備">入学準備</option>
+                    {availableCategories.map((category) => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
                   </select>
                 </label>
 
@@ -1517,7 +1612,7 @@ END:VEVENT
                 </label>
 
                 <label>
-                  Todoリスト
+                  やることリスト
                   <textarea
                     id="edit-todos"
                     name="todos"
@@ -1571,34 +1666,36 @@ END:VEVENT
             </div>
 
             <div className="modal-body">
-              <fieldset>
-                <legend>子どもを選択（複数選択可能）</legend>
-                <div className="children-selection">
-                  {children.map((child) => (
-                    <label key={child.id} className="child-checkbox">
-                      <input
-                        id={`child-check-${child.id}`}
-                        name={`child-check-${child.id}`}
-                        type="checkbox"
-                        checked={selectedChildrenForSchedule.includes(child.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedChildrenForSchedule([...selectedChildrenForSchedule, child.id])
-                          } else {
-                            setSelectedChildrenForSchedule(selectedChildrenForSchedule.filter(id => id !== child.id))
-                          }
-                        }}
-                      />
-                      <span>{child.name}</span>
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
-
               <div className="edit-form">
+                <fieldset className="category-fieldset">
+                  <legend>子どもを選択（複数選択可能）</legend>
+                  <div className="children-selection">
+                    {children.map((child) => (
+                      <label key={child.id} className="child-checkbox">
+                        <input
+                          id={`child-check-${child.id}`}
+                          name={`child-check-${child.id}`}
+                          type="checkbox"
+                          checked={selectedChildrenForSchedule.includes(child.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedChildrenForSchedule([...selectedChildrenForSchedule, child.id])
+                            } else {
+                              setSelectedChildrenForSchedule(selectedChildrenForSchedule.filter(id => id !== child.id))
+                            }
+                          }}
+                        />
+                        <span>{child.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+
                 <label>
                   スケジュール名
                   <input
+                    id="add-title"
+                    name="title"
                     type="text"
                     value={addScheduleForm.title}
                     onChange={(e) => setAddScheduleForm({ ...addScheduleForm, title: e.target.value })}
@@ -1610,6 +1707,8 @@ END:VEVENT
                 <label>
                   開始日
                   <input
+                    id="add-date"
+                    name="date"
                     type="date"
                     value={addScheduleForm.date}
                     onChange={(e) => setAddScheduleForm({ ...addScheduleForm, date: e.target.value })}
@@ -1620,6 +1719,8 @@ END:VEVENT
                 <label>
                   終了日
                   <input
+                    id="add-endDate"
+                    name="endDate"
                     type="date"
                     value={addScheduleForm.endDate}
                     onChange={(e) => setAddScheduleForm({ ...addScheduleForm, endDate: e.target.value })}
@@ -1630,28 +1731,23 @@ END:VEVENT
                 <label>
                   カテゴリ
                   <select
+                    id="add-category"
+                    name="category"
                     value={addScheduleForm.category}
                     onChange={(e) => setAddScheduleForm({ ...addScheduleForm, category: e.target.value })}
                     autoComplete="off"
                   >
-                    <option value="手続き">手続き</option>
-                    <option value="予防接種">予防接種</option>
-                    <option value="保育園">保育園</option>
-                    <option value="準備">準備</option>
-                    <option value="行事">行事</option>
-                    <option value="入学準備">入学準備</option>
-                    <option value="健康診断">健康診断</option>
-                    <option value="行政手続き">行政手続き</option>
-                    <option value="生活・成長">生活・成長</option>
-                    <option value="教育・発達">教育・発達</option>
-                    <option value="記念イベント">記念イベント</option>
-                    <option value="学校関連">学校関連</option>
+                    {availableCategories.map((category) => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
                   </select>
                 </label>
 
                 <label>
                   説明
                   <textarea
+                    id="add-description"
+                    name="description"
                     value={addScheduleForm.description || ''}
                     onChange={(e) => setAddScheduleForm({ ...addScheduleForm, description: e.target.value })}
                     placeholder="説明を入力"
@@ -1661,8 +1757,10 @@ END:VEVENT
                 </label>
 
                 <label>
-                  Todoリスト
+                  やることリスト
                   <textarea
+                    id="add-todos"
+                    name="todos"
                     value={addScheduleForm.todos.join('\n')}
                     onChange={(e) => setAddScheduleForm({ ...addScheduleForm, todos: e.target.value.split('\n').filter(item => item.trim()) })}
                     placeholder="各行に1つのタスクを入力してください"
@@ -1674,6 +1772,8 @@ END:VEVENT
                 <label>
                   準備物
                   <textarea
+                    id="add-supplies"
+                    name="supplies"
                     value={addScheduleForm.supplies.join('\n')}
                     onChange={(e) => setAddScheduleForm({ ...addScheduleForm, supplies: e.target.value.split('\n').filter(item => item.trim()) })}
                     placeholder="各行に1つの準備物を入力してください"
@@ -1706,27 +1806,36 @@ END:VEVENT
             <h2>子供情報を編集</h2>
             <div className="edit-form">
               <label>
-                名前（ニックネーム可）
+                名前（ニックネーム）
                 <input
+                  id="edit-child-name"
+                  name="name"
                   type="text"
                   value={editChildForm.name}
                   onChange={(e) => setEditChildForm({ ...editChildForm, name: e.target.value })}
+                  autoComplete="off"
                 />
               </label>
+              {fieldErrors.name && <p className="form-error">{fieldErrors.name}</p>}
 
               <label>
                 生年月日
                 <input
+                  id="edit-child-birthdate"
+                  name="birthDate"
                   type="date"
                   value={editChildForm.birthDate}
                   onChange={(e) => setEditChildForm({ ...editChildForm, birthDate: e.target.value })}
                 />
                 {editChildForm.birthDate && <p style={{margin: '6px 0 0', fontSize: '0.9rem', color: '#64748b'}}>現在: {calculateAge(editChildForm.birthDate)}</p>}
               </label>
+              {fieldErrors.birthDate && <p className="form-error">{fieldErrors.birthDate}</p>}
 
               <label>
                 性別
                 <select
+                  id="edit-child-gender"
+                  name="gender"
                   value={editChildForm.gender}
                   onChange={(e) => setEditChildForm({ ...editChildForm, gender: e.target.value })}
                 >
@@ -1736,8 +1845,10 @@ END:VEVENT
               </label>
 
               <label>
-                居住地（都道府県）
+                住んでいる都道府県
                 <select
+                  id="edit-child-prefecture"
+                  name="prefecture"
                   value={editChildForm.prefecture}
                   onChange={(e) => {
                     const prefecture = e.target.value
@@ -1752,30 +1863,53 @@ END:VEVENT
                   ))}
                 </select>
               </label>
+              {fieldErrors.prefecture && <p className="form-error">{fieldErrors.prefecture}</p>}
 
               {editChildForm.prefecture ? (
-                <label>
-                  居住地（市町村）
-                  <select
-                    value={editChildForm.municipality}
-                    onChange={(e) => setEditChildForm({ ...editChildForm, municipality: e.target.value })}
-                  >
-                    <option value="">選択してください</option>
-                    {PREFECTURES_MUNICIPALITIES[editChildForm.prefecture] && PREFECTURES_MUNICIPALITIES[editChildForm.prefecture].map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <>
+                  <label>
+                    住んでいる市町村
+                    <select
+                      id="edit-child-municipality"
+                      name="municipality"
+                      value={editChildForm.municipality}
+                      onChange={(e) => setEditChildForm({ ...editChildForm, municipality: e.target.value })}
+                    >
+                      <option value="">選択してください</option>
+                      {PREFECTURES_MUNICIPALITIES[editChildForm.prefecture] && PREFECTURES_MUNICIPALITIES[editChildForm.prefecture].map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {fieldErrors.municipality && <p className="form-error">{fieldErrors.municipality}</p>}
+                </>
               ) : null}
 
-              <fieldset>
-                <legend>表示するスケジュールのカテゴリ（選択なしで全て表示）</legend>
+              <fieldset className="category-fieldset">
+                <legend>追加するスケジュール</legend>
                 <div className="category-checkboxes">
+                  <label className="category-checkbox category-checkbox-all">
+                    <input
+                      id="edit-select-all-categories"
+                      name="edit-select-all-categories"
+                      type="checkbox"
+                      checked={editChildForm.selectedCategories.length === getAvailableCategories().length && getAvailableCategories().length > 0}
+                      onChange={(e) => {
+                        setEditChildForm({
+                          ...editChildForm,
+                          selectedCategories: e.target.checked ? getAvailableCategories() : []
+                        })
+                      }}
+                    />
+                    全選択
+                  </label>
                   {getAvailableCategories().map((category) => (
                     <label key={category} className="category-checkbox">
                       <input
+                        id={`edit-category-${category}`}
+                        name={`edit-category-${category}`}
                         type="checkbox"
                         checked={editChildForm.selectedCategories.includes(category)}
                         onChange={(e) => {
@@ -1797,6 +1931,7 @@ END:VEVENT
                   ))}
                 </div>
               </fieldset>
+              {fieldErrors.selectedCategories && <p className="form-error">{fieldErrors.selectedCategories}</p>}
             </div>
 
             <div className="modal-footer">
@@ -1823,6 +1958,17 @@ END:VEVENT
           }}
         />
       )}
+
+      {/* フローティングボタン */}
+      <a 
+        href="https://forms.gle/Pa2Nt4J8qay9nLNA9" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="floating-feedback-button"
+        title="お願い箱"
+      >
+        お願い箱
+      </a>
 
       {/* フッター */}
       <Footer 

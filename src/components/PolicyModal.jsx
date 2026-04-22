@@ -2,7 +2,9 @@
  * ポリシーモーダルコンポーネント
  */
 
-export const PolicyModal = ({ type, onClose }) => {
+import { memo } from 'react'
+
+const PolicyModalContent = ({ type, onClose }) => {
   const isPolicy = type === 'policy'
   
   return (
@@ -180,3 +182,5 @@ export const PolicyModal = ({ type, onClose }) => {
     </div>
   )
 }
+
+export const PolicyModal = memo(PolicyModalContent)

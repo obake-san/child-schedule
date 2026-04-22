@@ -1,28 +1,32 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 export function CountUp({ target, duration = 2000, label = '' }) {
   const [count, setCount] = useState(0)
+  const animationIdRef = useRef(null)
 
   useEffect(() => {
     if (target === undefined || target === null) return
 
     let start = 0
     const increment = target / (duration / 16) // 16ms per frame (60fps)
-    let animationId
 
     const animate = () => {
       start += increment
       if (start < target) {
         setCount(Math.floor(start))
-        animationId = requestAnimationFrame(animate)
+        animationIdRef.current = requestAnimationFrame(animate)
       } else {
         setCount(target)
       }
     }
 
-    animationId = requestAnimationFrame(animate)
+    animationIdRef.current = requestAnimationFrame(animate)
 
-    return () => cancelAnimationFrame(animationId)
+    return () => {
+      if (animationIdRef.current) {
+        cancelAnimationFrame(animationIdRef.current)
+      }
+    }
   }, [target, duration])
 
   return (

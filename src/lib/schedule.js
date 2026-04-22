@@ -1,27 +1,13 @@
-// カテゴリの優先順序を定義
-const CATEGORY_ORDER = [
-  '手続き',
-  '行政手続き',
-  '準備',
-  '健康診断',
-  '予防接種',
-  '保育園',
-  '生活・成長',
-  '教育・発達',
-  '入学準備',
-  '学校関連',
-  '記念イベント',
-  '行事'
-]
+import { CATEGORY_ORDER } from '../constants.js'
 
 const scheduleTemplate = [
-  // ==================== 手続き（誕生後の最初の対応） ====================
+  // ==================== 行政手続き（誕生後の最初の対応） ====================
   {
     months: 0,
     durationDays: 14,
     title: '出生届の提出',
     description: '生後14日以内に市区町村役場へ出生届を提出します。',
-    category: '手続き',
+    category: '行政手続き',
     todos: [
       '市区町村役場で出生届の用紙をもらう',
       '医師の出生証明書を準備',
@@ -40,7 +26,7 @@ const scheduleTemplate = [
     durationDays: 14,
     title: '母子健康手帳で健診を確認',
     description: '母子健康手帳に予防接種や健診の予定を記録し、必要書類を確認します。',
-    category: '手続き',
+    category: '行政手続き',
     todos: [
       '母子健康手帳を確認',
       '1か月健診の予約',
@@ -58,7 +44,7 @@ const scheduleTemplate = [
     durationDays: 14,
     title: '1歳半健診の準備',
     description: '1歳6か月健診の日時や持ち物を確認します。',
-    category: '手続き',
+    category: '行政手続き',
     todos: [
       '1歳半健診の日時確認',
       '必要書類の準備',
@@ -136,7 +122,7 @@ const scheduleTemplate = [
     durationDays: 30,
     title: '育児用品・衣服のサイズ確認',
     description: '成長にあわせて洋服やベビー用品を準備します。',
-    category: '準備',
+    category: '育児準備',
     todos: [
       '現在のベビー服サイズを確認',
       'オムツのサイズを確認',
@@ -535,6 +521,48 @@ const scheduleTemplate = [
     ]
   },
   
+  // ==================== 幼稚園 ====================
+  {
+    months: 24,
+    durationDays: 30,
+    title: '幼稚園入園情報を集める',
+    description: '幼稚園の募集要項や入園申込のタイミングを調べましょう。',
+    category: '幼稚園',
+    todos: [
+      '市区町村の幼稚園リスト確認',
+      '各幼稚園の募集要項を取寄せ',
+      '希望地域の幼稚園リストアップ',
+      '各園の教育方針や特色を調べ',
+      '幼稚園の見学予定を相談'
+    ],
+    supplies: [
+      '幼稚園リスト作成用ノート',
+      'ペン',
+      '募集要項・パンフレット'
+    ]
+  },
+  {
+    months: 30,
+    durationDays: 30,
+    title: '幼稚園見学や入園相談',
+    description: '地域の幼稚園を見学し、教育内容や入園方法を確認します。',
+    category: '幼稚園',
+    todos: [
+      '幼稚園見学の予約',
+      '見学当日の持ち物確認',
+      '園の授業内容・カリキュラム確認',
+      'イベント・特別活動を質問',
+      '見学内容をメモ・記録',
+      '複数園の比較検討'
+    ],
+    supplies: [
+      'ノート',
+      'ペン',
+      '上履き',
+      'カメラ・スマートフォン'
+    ]
+  },
+  
   // ==================== 生活・成長 ====================
   {
     months: 5,
@@ -817,7 +845,7 @@ const scheduleTemplate = [
     durationDays: 7,
     title: '100日祝い',
     description: '生後100日の成長をお祝いします。',
-    category: '記念イベント',
+    category: '行事・記念イベント',
     specialDays: 100
   },
   {
@@ -825,21 +853,21 @@ const scheduleTemplate = [
     durationDays: 7,
     title: 'ハーフバースデー',
     description: '生後6ヶ月の記念日をお祝いします。',
-    category: '記念イベント'
+    category: '行事・記念イベント'
   },
   {
     months: 12,
     durationDays: 7,
     title: '初誕生日',
     description: '初めての誕生日をお祝いします。',
-    category: '記念イベント'
+    category: '行事・記念イベント'
   },
   {
     months: 36,
     durationDays: 30,
     title: '七五三（3歳）',
     description: '子供の健やかな成長を祝う伝統的な行事です。写真撮影や神社参拝の準備をしましょう。',
-    category: '行事',
+    category: '行事・記念イベント',
     todos: [
       '写真館の予約・撮影',
       '衣装のレンタル・購入',
@@ -858,7 +886,7 @@ const scheduleTemplate = [
     durationDays: 30,
     title: '七五三（5歳）',
     description: '子供の健やかな成長を祝う伝統的な行事です。写真撮影や神社参拝の準備をしましょう。',
-    category: '行事',
+    category: '行事・記念イベント',
     todos: [
       '七五三写真撮影予約',
       '衣装の準備',
@@ -877,7 +905,7 @@ const scheduleTemplate = [
     durationDays: 30,
     title: '七五三（7歳）',
     description: '子供の健やかな成長を祝う伝統的な行事です。写真撮影や神社参拝の準備をしましょう。',
-    category: '行事',
+    category: '行事・記念イベント',
     todos: [
       '帯または帯留めの選定',
       '髪型の相談',
@@ -920,7 +948,7 @@ export function generateSchedule(child) {
     durationDays: 30,
     title: `${genderLabel}の衣類・準備品を確認`,
     description: `${genderLabel}の成長にあわせて洋服やおでかけグッズを整えます。`,
-    category: '準備'
+    category: '育児準備'
   }
 
   let items = [...scheduleTemplate, customEvent]
@@ -938,7 +966,7 @@ export function generateSchedule(child) {
           durationDays: 7,
           title: '初節句（ひな祭り）',
           description: '女の子の初めてのひな祭りをお祝いします。',
-          category: '記念イベント',
+          category: '行事・記念イベント',
           specialDate: hatsusekku.toISOString().slice(0, 10)
         })
       } else {
@@ -950,7 +978,7 @@ export function generateSchedule(child) {
           durationDays: 7,
           title: '初節句（ひな祭り）',
           description: '女の子の初めてのひな祭りをお祝いします。',
-          category: '記念イベント',
+          category: '行事・記念イベント',
           specialDate: nextyear.toISOString().slice(0, 10)
         })
       }
@@ -964,7 +992,7 @@ export function generateSchedule(child) {
           durationDays: 7,
           title: '初節句（こどもの日）',
           description: '男の子の初めてのこどもの日をお祝いします。',
-          category: '記念イベント',
+          category: '行事・記念イベント',
           specialDate: hatsusekku.toISOString().slice(0, 10)
         })
       } else {
@@ -976,7 +1004,7 @@ export function generateSchedule(child) {
           durationDays: 7,
           title: '初節句（こどもの日）',
           description: '男の子の初めてのこどもの日をお祝いします。',
-          category: '記念イベント',
+          category: '行事・記念イベント',
           specialDate: nextyear.toISOString().slice(0, 10)
         })
       }
@@ -1051,6 +1079,88 @@ export function generateSchedule(child) {
       '通園バッグ',
       'お弁当箱・水筒',
       '着替え（下着・靴下・上下衣類）'
+    ]
+  })
+
+  // 幼稚園申請スケジュール（生年月日の年 + 3年の4月入園を想定）
+  const kindergartenEntranceYear = birthDate.getFullYear() + 3
+  const kindergartenApplicationStartDate = new Date(kindergartenEntranceYear - 1, 9, 1) // 前年10月1日
+  const kindergartenApplicationEndDate = new Date(kindergartenEntranceYear - 1, 10, 31) // 前年11月30日
+  const kindergartenResultDate = new Date(kindergartenEntranceYear - 1, 11, 1) // 前年12月1日
+  const kindergartenEntranceDate = new Date(kindergartenEntranceYear, 3, 1) // 4月1日
+
+  items.push({
+    id: 'auto-kindergarten-application-start',
+    months: -1,
+    durationDays: 60,
+    title: `幼稚園申請期間（${kindergartenApplicationStartDate.getFullYear()}年度入園）`,
+    description: `${kindergartenEntranceYear}年4月入園の申請期間です。幼稚園で願書配布・受付が行われます。`,
+    category: '幼稚園',
+    specialDate: kindergartenApplicationStartDate.toISOString().slice(0, 10),
+    specialEndDate: kindergartenApplicationEndDate.toISOString().slice(0, 10),
+    todos: [
+      '幼稚園の願書を入手',
+      '願書に必要事項を記入',
+      '子どもの写真を用意',
+      '幼稚園に願書を提出',
+      '入園金など必要な手数料を確認'
+    ],
+    supplies: [
+      '願書',
+      '記入用ペン',
+      '子どもの写真（4×3cm程度）',
+      'はんこ',
+      '身上書'
+    ]
+  })
+
+  items.push({
+    id: 'auto-kindergarten-result',
+    months: -1,
+    durationDays: 30,
+    title: `幼稚園入園結果発表（${kindergartenEntranceYear}年度）`,
+    description: `${kindergartenEntranceYear}年4月入園の結果が発表されます。`,
+    category: '幼稚園',
+    specialDate: kindergartenResultDate.toISOString().slice(0, 10),
+    todos: [
+      '入園結果確認',
+      '入園許可通知書を受け取る',
+      '入園金を納付',
+      '入園手続き書類を提出',
+      '余裕があれば他園も検討'
+    ]
+  })
+
+  items.push({
+    id: 'auto-kindergarten-entrance-prep',
+    months: -1,
+    durationDays: 120,
+    title: `幼稚園入園準備（${kindergartenEntranceYear}年度）`,
+    description: `${kindergartenEntranceYear}年4月入園に向けた準備を進めます。`,
+    category: '幼稚園',
+    specialDate: new Date(kindergartenEntranceYear - 1, 11, 15).toISOString().slice(0, 10),
+    todos: [
+      '園からの入園書類を整理',
+      '上履き・外靴を用意',
+      '体操着・制服を購入・採寸',
+      '通園バッグ・ハンカチ・ティッシュを準備',
+      'お弁当グッズ（弁当箱・水筒）を購入',
+      'お名前シール・お名前ペンで記名',
+      '予防接種やアレルギー対応の事前報告',
+      '通園方法・スケジュール確認'
+    ],
+    supplies: [
+      '上履き',
+      '外靴',
+      '体操着',
+      '制服',
+      '通園バッグ',
+      'ハンカチ・ティッシュ',
+      'お弁当箱',
+      '水筒',
+      'お箸・スプーン',
+      'お名前シール',
+      'お名前ペン'
     ]
   })
 
@@ -1281,16 +1391,24 @@ export function isHoliday(year, month, day) {
   if (fixedHolidays[key]) return true
 
   // ハッピーマンデー
-  const happyMondays = {
-    '1-2': '成人の日', // 1月の第2月曜日
-    '7-3': '海の日',   // 7月の第3月曜日
-    '9-3': '敬老の日', // 9月の第3月曜日
-    '10-2': '体育の日' // 10月の第2月曜日
+  if (month === 1 && weekday === 1) { // 1月の第2月曜日
+    const expectedDay = getNthWeekday(year, month, 1, 2)
+    if (day === expectedDay) return true
   }
-
-  if (happyMondays[key]) {
-    const expectedDay = getNthWeekday(year, month, 1, parseInt(key.split('-')[1]))
-    return day === expectedDay
+  
+  if (month === 7 && weekday === 1) { // 7月の第3月曜日
+    const expectedDay = getNthWeekday(year, month, 1, 3)
+    if (day === expectedDay) return true
+  }
+  
+  if (month === 9 && weekday === 1) { // 9月の第3月曜日
+    const expectedDay = getNthWeekday(year, month, 1, 3)
+    if (day === expectedDay) return true
+  }
+  
+  if (month === 10 && weekday === 1) { // 10月の第2月曜日
+    const expectedDay = getNthWeekday(year, month, 1, 2)
+    if (day === expectedDay) return true
   }
 
   // 春分の日・秋分の日

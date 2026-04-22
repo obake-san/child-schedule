@@ -35,40 +35,44 @@ export const useDeviceType = () => {
 }
 
 // Get responsive value based on device type
-export const getResponsiveValue = (mobileValue, tabletValue, desktopValue, deviceType) => {
-  switch (deviceType) {
-    case 'mobile':
-      return mobileValue
-    case 'tablet':
-      return tabletValue
-    case 'desktop':
-      return desktopValue
-    default:
-      return desktopValue
-  }
-}
+// 未使用: 現在のアーキテクチャでは必要ない
+// export const getResponsiveValue = (mobileValue, tabletValue, desktopValue, deviceType) => {
+//   switch (deviceType) {
+//     case 'mobile':
+//       return mobileValue
+//     case 'tablet':
+//       return tabletValue
+//     case 'desktop':
+//       return desktopValue
+//     default:
+//       return desktopValue
+//   }
+// }
 
 // Check if device is touch-enabled
-export const isTouchDevice = () => {
-  if (typeof window === 'undefined') return false
-  return (
-    (typeof window.ontouchstart !== 'undefined') ||
-    (navigator.maxTouchPoints > 0) ||
-    (navigator.msMaxTouchPoints > 0)
-  )
-}
+// 未使用: 現在のアーキテクチャでは必要ない
+// export const isTouchDevice = () => {
+//   if (typeof window === 'undefined') return false
+//   return (
+//     (typeof window.ontouchstart !== 'undefined') ||
+//     (navigator.maxTouchPoints > 0) ||
+//     (navigator.msMaxTouchPoints > 0)
+//   )
+// }
 
 // Check media query
-export const matchesMedia = (query) => {
-  if (typeof window === 'undefined') return false
-  return window.matchMedia(query).matches
-}
+// 未使用: 現在のアーキテクチャでは必要ない
+// export const matchesMedia = (query) => {
+//   if (typeof window === 'undefined') return false
+//   return window.matchMedia(query).matches
+// }
 
 // Get viewport size
-export const getViewportSize = () => {
-  if (typeof window === 'undefined') return { width: 1024, height: 768 }
-  return {
-    width: window.innerWidth,
-    height: window.innerHeight
-  }
-}
+// 未使用: 現在のアーキテクチャでは必要ない
+// export const getViewportSize = () => {
+//   if (typeof window === 'undefined') return { width: 1024, height: 768 }
+//   return {
+//     width: window.innerWidth,
+//     height: window.innerHeight
+//   }
+// }
