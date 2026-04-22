@@ -1,3 +1,5 @@
+import FloatingMenuButton from './components/FloatingMenuButton'
+
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { ChildCalendar } from './components/ChildCalendar'
 import { Footer } from './components/Footer'
@@ -14,6 +16,18 @@ import { downloadCalendarFile } from './utils/calendar'
 import { importDataFromFile, clearFileInput, validateImportedData } from './utils/importExport'
 
 function App() {
+      // メニューからやることリスト押下時にviewModeを切り替えるカスタムイベントリスナー
+      useEffect(() => {
+        const handler = () => setViewMode('list');
+        window.addEventListener('setViewModeList', handler);
+        return () => window.removeEventListener('setViewModeList', handler);
+      }, []);
+    // メニューからカレンダー押下時にviewModeを切り替えるカスタムイベントリスナー
+    useEffect(() => {
+      const handler = () => setViewMode('combined-calendar');
+      window.addEventListener('setViewModeCombinedCalendar', handler);
+      return () => window.removeEventListener('setViewModeCombinedCalendar', handler);
+    }, []);
   const today = new Date().toISOString().slice(0, 10)
   const deviceType = useDeviceType()
   
@@ -1097,7 +1111,34 @@ END:VEVENT
   }
 
   return (
-    <div className="app-shell">
+    <>
+      {/* 固定ヘッダー */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '48px',
+        background: 'linear-gradient(135deg, #E8B896 0%, #B57C56 100%)',
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        zIndex: 1200,
+        boxShadow: '0 2px 8px rgba(181,124,86,0.15)',
+        padding: '0 12px',
+      }}>
+        <span
+          style={{ fontWeight: 700, fontSize: '1.2rem', letterSpacing: '0.05em', textAlign: 'left', cursor: 'pointer', flex: 1 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
+          楽々キッズかれんだぁ
+        </span>
+        <div style={{ height: '100%', display: 'flex', alignItems: 'center', marginLeft: 8 }}>
+          <FloatingMenuButton childrenCount={children.length} />
+        </div>
+      </div>
+      <div style={{ height: '48px' }} /> {/* ヘッダー分の余白 */}
+      <div className="app-shell">
       <header className="hero">
         <div>
           <p className="eyebrow">現役パパが使いたいから作った</p>
@@ -1121,7 +1162,7 @@ END:VEVENT
       </header>
 
       <main>
-        <section className="panel">
+        <section className="panel" id="add-child-section">
           <h2>子どもを追加</h2>
           <form className="input-form" onSubmit={handleSubmit}>
             <label>
@@ -1172,8 +1213,6 @@ END:VEVENT
                 value={form.prefecture}
                 onChange={(event) => {
                   const prefecture = event.target.value
-                  // デバッグ用: 選択した都道府県と市町村リストを出力
-                  console.log('都道府県:', prefecture, '市町村リスト:', PREFECTURES_MUNICIPALITIES[prefecture])
                   setForm({ ...form, prefecture, municipality: '' })
                 }}
                 autoComplete="off"
@@ -1258,7 +1297,7 @@ END:VEVENT
           </form>
         </section>
 
-        <section className="panel">
+        <section className="panel" id="registered-children">
           <div className="section-header">
             <div>
               <h2>登録済みの子ども</h2>
@@ -1300,8 +1339,9 @@ END:VEVENT
           )}
         </section>
 
+
         {viewMode === 'list' && children.length > 0 && (
-          <section className="panel">
+          <section className="panel" id="todo-list">
             <div className="section-header">
               <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                 <h2 style={{ margin: 0 }}>やることリスト</h2>
@@ -1322,6 +1362,7 @@ END:VEVENT
                     type="button"
                     className={viewMode === 'combined-calendar' ? 'active' : ''}
                     onClick={() => setViewMode('combined-calendar')}
+                    id="calendar-section"
                   >
                     カレンダー
                   </button>
@@ -1368,11 +1409,10 @@ END:VEVENT
                 )}
               </div>
             )}
-            <>
-              {summary
-                .filter((child) => selectedChildIds.length === 0 || selectedChildIds.includes(child.id))
-                .map((child) => (
-                  <article key={child.id} className="child-card">
+            {summary
+              .filter((child) => selectedChildIds.length === 0 || selectedChildIds.includes(child.id))
+              .map((child) => (
+                <article key={child.id} className="child-card">
                   <div className="child-header">
                     <div>
                       <h3>{child.name}</h3>
@@ -1380,7 +1420,6 @@ END:VEVENT
                       <p>性別: {child.gender === 'male' ? '男の子' : '女の子'}</p>
                     </div>
                   </div>
-
                   <div className="schedule-grid">
                     {child.schedule.map((item) => (
                       <div
@@ -1402,12 +1441,11 @@ END:VEVENT
                   </div>
                 </article>
               ))}
-            </>
           </section>
         )}
 
         {viewMode === 'combined-calendar' && children.length > 0 && (
-          <section className="panel">
+          <section className="panel" id="calendar-section">
             <div className="section-header">
               <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
                 <h2 style={{ margin: 0 }}>カレンダー</h2>
@@ -1428,6 +1466,7 @@ END:VEVENT
                     type="button"
                     className={viewMode === 'combined-calendar' ? 'active' : ''}
                     onClick={() => setViewMode('combined-calendar')}
+                    id="calendar-section"
                   >
                     カレンダー
                   </button>
@@ -1490,7 +1529,7 @@ END:VEVENT
           </section>
         )}
 
-        <section className="panel save-section">
+        <section className="panel save-section" id="data-management">
           <div className="section-header">
             <div>
               <h2>データ管理</h2>
@@ -1983,7 +2022,8 @@ END:VEVENT
       />
 
     </div>
-  )
+    </>
+  );
 }
 
 export default App

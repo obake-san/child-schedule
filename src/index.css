@@ -1,3 +1,14 @@
+/* メニューポップアップ用: セクションと同じデザイン */
+.floating-menu-popup {
+  background: var(--panel-bg);
+  border-radius: 22px;
+  box-shadow: var(--panel-shadow);
+  border: 2px solid var(--color-primary-border);
+  min-width: 220px;
+  padding: 8px 0;
+  color: var(--color-text-dark);
+  z-index: 2000;
+}
 @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap');
 
 html {
