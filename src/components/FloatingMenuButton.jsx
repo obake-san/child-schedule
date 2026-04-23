@@ -74,12 +74,12 @@ const scrollToSection = (id) => {
 // App.jsxのviewModeを切り替えるためのカスタムイベントを使う
 const setTodoListViewAndScroll = () => {
   window.dispatchEvent(new CustomEvent('setViewModeList'));
-  setTimeout(() => scrollToSection('todo-list'), 0);
+  setTimeout(() => scrollToSection('todo-calendar-section'), 0);
 };
 
 const setCalendarViewAndScroll = () => {
   window.dispatchEvent(new CustomEvent('setViewModeCombinedCalendar'));
-  setTimeout(() => scrollToSection('calendar-section'), 0);
+  setTimeout(() => scrollToSection('todo-calendar-section'), 0);
 };
 
 

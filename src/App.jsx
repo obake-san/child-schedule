@@ -1350,194 +1350,124 @@ END:VEVENT
         </section>
 
 
-        {viewMode === 'list' && children.length > 0 && (
-          <section className="panel" id="todo-list">
+        {children.length > 0 && (
+          <section className="panel" id="todo-calendar-section">
             <div className="section-header">
               <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                <h2 style={{ margin: 0 }}>やることリスト</h2>
+                <h2 style={{ margin: 0 }}>
+                  {viewMode === 'list' ? 'やることリスト' : 'カレンダー'}
+                </h2>
                 <button className="add-schedule-button" onClick={openScheduleAdder}>
                   + 追加
                 </button>
               </div>
-              {children.length > 0 && (
-                <div className="view-toggle">
-                  <button
-                    type="button"
-                    className={viewMode === 'list' ? 'active' : ''}
-                    onClick={() => setViewMode('list')}
-                  >
-                    やることリスト
-                  </button>
-                  <button
-                    type="button"
-                    className={viewMode === 'combined-calendar' ? 'active' : ''}
-                    onClick={() => setViewMode('combined-calendar')}
-                    id="calendar-section"
-                  >
-                    カレンダー
-                  </button>
-                </div>
-              )}
-            </div>
-            {children.length > 0 && (
-              <div className="child-filter-tabs">
+              <div className="view-toggle">
                 <button
                   type="button"
-                  className={selectedChildIds.length === 0 ? 'active' : ''}
-                  onClick={() => setSelectedChildIds([])}
+                  className={viewMode === 'list' ? 'active' : ''}
+                  onClick={() => setViewMode('list')}
                 >
-                  すべて
+                  やることリスト
                 </button>
-                {children.length >= 3 ? (
-                  children.map((child) => (
-                    <button
-                      key={child.id}
-                      type="button"
-                      className={selectedChildIds.includes(child.id) ? 'active' : ''}
-                      onClick={() => {
-                        if (selectedChildIds.includes(child.id)) {
-                          setSelectedChildIds(selectedChildIds.filter(id => id !== child.id))
-                        } else {
-                          setSelectedChildIds([...selectedChildIds, child.id])
-                        }
-                      }}
-                    >
-                      {child.name}
-                    </button>
-                  ))
-                ) : (
-                  children.map((child) => (
-                    <button
-                      key={child.id}
-                      type="button"
-                      className={selectedChildIds.includes(child.id) ? 'active' : ''}
-                      onClick={() => setSelectedChildIds([child.id])}
-                    >
-                      {child.name}
-                    </button>
-                  ))
-                )}
+                <button
+                  type="button"
+                  className={viewMode === 'combined-calendar' ? 'active' : ''}
+                  onClick={() => setViewMode('combined-calendar')}
+                >
+                  カレンダー
+                </button>
               </div>
-            )}
-            {summary
-              .filter((child) => selectedChildIds.length === 0 || selectedChildIds.includes(child.id))
-              .map((child) => (
-                <article key={child.id} className="child-card">
-                  <div className="child-header">
-                    <div>
-                      <h3>{child.name}</h3>
-                      <p>生年月日: {formatDate(child.birthDate)}（{calculateAge(child.birthDate)}）</p>
-                      <p>性別: {child.gender === 'male' ? '男の子' : '女の子'}</p>
-                    </div>
-                  </div>
-                  <div className="schedule-grid">
-                    {child.schedule.map((item) => (
-                      <div
-                        key={`${child.id}-${item.date}-${item.title}`}
-                        className="schedule-item"
-                        onClick={() => openScheduleEditor(child.id, item)}
-                        style={{ cursor: 'pointer' }}
-                      >
-                        <div className="item-meta">
-                          <span className="item-date">{formatRange(item.date, item.endDate)}</span>
-                          <span className={`item-category category-${item.category}`}>
-                            {item.category}
-                          </span>
-                        </div>
-                        <strong>{item.title}</strong>
-                        <p>{item.description}</p>
+            </div>
+            <div className="child-filter-tabs">
+              <button
+                type="button"
+                className={selectedChildIds.length === 0 ? 'active' : ''}
+                onClick={() => setSelectedChildIds([])}
+              >
+                すべて
+              </button>
+              {children.length >= 3 &&
+                children.map((child) => (
+                  <button
+                    key={child.id}
+                    type="button"
+                    className={selectedChildIds.includes(child.id) ? 'active' : ''}
+                    onClick={() => {
+                      if (selectedChildIds.includes(child.id)) {
+                        setSelectedChildIds(selectedChildIds.filter(id => id !== child.id))
+                      } else {
+                        setSelectedChildIds([...selectedChildIds, child.id])
+                      }
+                    }}
+                  >
+                    {child.name}
+                  </button>
+                ))}
+              {children.length < 3 &&
+                children.map((child) => (
+                  <button
+                    key={child.id}
+                    type="button"
+                    className={selectedChildIds.includes(child.id) ? 'active' : ''}
+                    onClick={() => setSelectedChildIds([child.id])}
+                  >
+                    {child.name}
+                  </button>
+                ))}
+            </div>
+            {/* 表示切り替え */}
+            {viewMode === 'list' && (
+              summary
+                .filter((child) => selectedChildIds.length === 0 || selectedChildIds.includes(child.id))
+                .map((child) => (
+                  <article key={child.id} className="child-card">
+                    <div className="child-header">
+                      <div>
+                        <h3>{child.name}</h3>
+                        <p>生年月日: {formatDate(child.birthDate)}（{calculateAge(child.birthDate)}）</p>
+                        <p>性別: {child.gender === 'male' ? '男の子' : '女の子'}</p>
                       </div>
-                    ))}
-                  </div>
-                </article>
-              ))}
+                    </div>
+                    <div className="schedule-grid">
+                      {child.schedule.map((item) => (
+                        <div
+                          key={`${child.id}-${item.date}-${item.title}`}
+                          className="schedule-item"
+                          onClick={() => openScheduleEditor(child.id, item)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <div className="item-meta">
+                            <span className="item-date">{formatRange(item.date, item.endDate)}</span>
+                            <span className={`item-category category-${item.category}`}>
+                              {item.category}
+                            </span>
+                          </div>
+                          <strong>{item.title}</strong>
+                          <p>{item.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </article>
+                ))
+            )}
+            {viewMode === 'combined-calendar' && (
+              <ChildCalendar
+                children={[
+                  {
+                    id: 'combined',
+                    name: '統合',
+                    schedule: selectedChildIds.length > 0
+                      ? combinedSchedule.filter(item => selectedChildIds.includes(item.childId))
+                      : combinedSchedule
+                  }
+                ]}
+                selectedChildIds={['combined']}
+                onEventClick={openScheduleEditor}
+              />
+            )}
           </section>
         )}
 
-        {viewMode === 'combined-calendar' && children.length > 0 && (
-          <section className="panel" id="calendar-section">
-            <div className="section-header">
-              <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                <h2 style={{ margin: 0 }}>カレンダー</h2>
-                <button className="add-schedule-button" onClick={openScheduleAdder}>
-                  + 追加
-                </button>
-              </div>
-              {children.length > 0 && (
-                <div className="view-toggle">
-                  <button
-                    type="button"
-                    className={viewMode === 'list' ? 'active' : ''}
-                    onClick={() => setViewMode('list')}
-                  >
-                    やることリスト
-                  </button>
-                  <button
-                    type="button"
-                    className={viewMode === 'combined-calendar' ? 'active' : ''}
-                    onClick={() => setViewMode('combined-calendar')}
-                    id="calendar-section"
-                  >
-                    カレンダー
-                  </button>
-                </div>
-              )}
-            </div>
-            {children.length > 0 && (
-              <div className="child-filter-tabs">
-                <button
-                  type="button"
-                  className={selectedChildIds.length === 0 ? 'active' : ''}
-                  onClick={() => setSelectedChildIds([])}
-                >
-                  すべて
-                </button>
-                {children.length >= 3 ? (
-                  children.map((child) => (
-                    <button
-                      key={child.id}
-                      type="button"
-                      className={selectedChildIds.includes(child.id) ? 'active' : ''}
-                      onClick={() => {
-                        if (selectedChildIds.includes(child.id)) {
-                          setSelectedChildIds(selectedChildIds.filter(id => id !== child.id))
-                        } else {
-                          setSelectedChildIds([...selectedChildIds, child.id])
-                        }
-                      }}
-                    >
-                      {child.name}
-                    </button>
-                  ))
-                ) : (
-                  children.map((child) => (
-                    <button
-                      key={child.id}
-                      type="button"
-                      className={selectedChildIds.includes(child.id) ? 'active' : ''}
-                      onClick={() => setSelectedChildIds([child.id])}
-                    >
-                      {child.name}
-                    </button>
-                  ))
-                )}
-              </div>
-            )}
-            <ChildCalendar
-              children={[
-                {
-                  id: 'combined',
-                  name: '統合',
-                  schedule: selectedChildIds.length > 0
-                    ? combinedSchedule.filter(item => selectedChildIds.includes(item.childId))
-                    : combinedSchedule
-                }
-              ]}
-              selectedChildIds={['combined']}
-              onEventClick={openScheduleEditor}
-            />
-          </section>
-        )}
 
         <section className="panel save-section" id="data-management">
           <div className="section-header">
