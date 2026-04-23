@@ -1525,6 +1525,7 @@ END:VEVENT
 
             <div className="modal-body">
               <div className="edit-form">
+                {/* スケジュール名 */}
                 <label>
                   スケジュール名
                   <input
@@ -1538,30 +1539,7 @@ END:VEVENT
                   />
                 </label>
 
-                <label>
-                  開始日
-                  <input
-                    id="edit-date"
-                    name="date"
-                    type="date"
-                    value={editForm.date}
-                    onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
-                    autoComplete="off"
-                  />
-                </label>
-
-                <label>
-                  終了日
-                  <input
-                    id="edit-endDate"
-                    name="endDate"
-                    type="date"
-                    value={editForm.endDate}
-                    onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
-                    autoComplete="off"
-                  />
-                </label>
-
+                {/* カテゴリ */}
                 <label>
                   カテゴリ
                   <select
@@ -1577,6 +1555,33 @@ END:VEVENT
                   </select>
                 </label>
 
+                {/* 開始日 */}
+                <label>
+                  開始日
+                  <input
+                    id="edit-date"
+                    name="date"
+                    type="date"
+                    value={editForm.date}
+                    onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                    autoComplete="off"
+                  />
+                </label>
+
+                {/* 終了日 */}
+                <label>
+                  終了日
+                  <input
+                    id="edit-endDate"
+                    name="endDate"
+                    type="date"
+                    value={editForm.endDate}
+                    onChange={(e) => setEditForm({ ...editForm, endDate: e.target.value })}
+                    autoComplete="off"
+                  />
+                </label>
+
+                {/* 説明 */}
                 <label>
                   説明
                   <textarea
@@ -1590,6 +1595,7 @@ END:VEVENT
                   />
                 </label>
 
+                {/* やることリスト */}
                 <label>
                   やることリスト
                   <textarea
@@ -1603,6 +1609,7 @@ END:VEVENT
                   />
                 </label>
 
+                {/* 準備物 */}
                 <label>
                   準備物
                   <textarea
@@ -1646,6 +1653,7 @@ END:VEVENT
 
             <div className="modal-body">
               <div className="edit-form">
+                {/* 子どもを選択 */}
                 <fieldset className="category-fieldset">
                   <legend>子どもを選択（複数選択可能）</legend>
                   <div className="children-selection">
@@ -1670,6 +1678,7 @@ END:VEVENT
                   </div>
                 </fieldset>
 
+                {/* スケジュール名 */}
                 <label>
                   スケジュール名
                   <input
@@ -1683,30 +1692,7 @@ END:VEVENT
                   />
                 </label>
 
-                <label>
-                  開始日
-                  <input
-                    id="add-date"
-                    name="date"
-                    type="date"
-                    value={addScheduleForm.date}
-                    onChange={(e) => setAddScheduleForm({ ...addScheduleForm, date: e.target.value })}
-                    autoComplete="off"
-                  />
-                </label>
-
-                <label>
-                  終了日
-                  <input
-                    id="add-endDate"
-                    name="endDate"
-                    type="date"
-                    value={addScheduleForm.endDate}
-                    onChange={(e) => setAddScheduleForm({ ...addScheduleForm, endDate: e.target.value })}
-                    autoComplete="off"
-                  />
-                </label>
-
+                {/* カテゴリ */}
                 <label>
                   カテゴリ
                   <select
@@ -1722,6 +1708,33 @@ END:VEVENT
                   </select>
                 </label>
 
+                {/* 開始日 */}
+                <label>
+                  開始日
+                  <input
+                    id="add-date"
+                    name="date"
+                    type="date"
+                    value={addScheduleForm.date}
+                    onChange={(e) => setAddScheduleForm({ ...addScheduleForm, date: e.target.value })}
+                    autoComplete="off"
+                  />
+                </label>
+
+                {/* 終了日 */}
+                <label>
+                  終了日
+                  <input
+                    id="add-endDate"
+                    name="endDate"
+                    type="date"
+                    value={addScheduleForm.endDate}
+                    onChange={(e) => setAddScheduleForm({ ...addScheduleForm, endDate: e.target.value })}
+                    autoComplete="off"
+                  />
+                </label>
+
+                {/* 説明 */}
                 <label>
                   説明
                   <textarea
@@ -1735,6 +1748,7 @@ END:VEVENT
                   />
                 </label>
 
+                {/* やることリスト */}
                 <label>
                   やることリスト
                   <textarea
@@ -1748,6 +1762,7 @@ END:VEVENT
                   />
                 </label>
 
+                {/* 準備物 */}
                 <label>
                   準備物
                   <textarea
