@@ -242,7 +242,6 @@ export const incrementUserCount = async () => {
   try {
     const statsRef = ref(database, 'stats/totalUsers')
     const snapshot = await get(statsRef)
-    
     const currentCount = snapshot.exists() ? (snapshot.val() || 0) : 0
     const newCount = currentCount + 1
     await set(statsRef, newCount)

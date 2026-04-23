@@ -130,8 +130,13 @@ function App() {
     }
   }, [])
 
-  // フォーム入力内容をリアルタイムで自動保存
+  // フォーム入力内容をリアルタイムで自動保存（子ども追加時のリセットは除外）
+  const formSaveSkipRef = useRef(false);
   useEffect(() => {
+    if (formSaveSkipRef.current) {
+      formSaveSkipRef.current = false;
+      return;
+    }
     try {
       window.localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(form))
     } catch (error) {
@@ -369,45 +374,50 @@ function App() {
 
     // Firebase に保存
     if (groupId) {
-      saveDataToFirebase(groupId, { children: updatedChildren, form }).then(() => {
-        // 初回保存時のカウント処理
-        const userCountKey = `userCountIncremented_${groupId}`
-        const alreadyIncremented = window.localStorage.getItem(userCountKey) === 'true'
+      // 1人目の子供追加時のみ、保存前にグループ存在チェック→カウントアップ
+      const userCountKey = `userCountIncremented_${groupId}`;
+      const alreadyIncremented = window.localStorage.getItem(userCountKey) === 'true';
+      const doIncrementUserCount = !alreadyIncremented && children.length === 0;
 
-        if (!alreadyIncremented) {
-          // 先に DB に存在するかチェック
-          getDataFromFirebase(groupId).then((existingData) => {
-            if (!existingData) {
-              // DB に存在しない新規グループなので、利用者カウント
-              incrementUserCount()
-            }
-            window.localStorage.setItem(userCountKey, 'true')
-          })
-        }
-
+      const handleAfterSave = () => {
         // 子ども数をカウント
-        incrementChildCount()
+        incrementChildCount();
+        // フォームはリセットしない（入力内容を残す）
+        clearFieldErrors();
+        showSuccess();
+      };
 
-        // フォームをリセット
-        setForm(getInitialForm())
-        clearFieldErrors()
-        showSuccess()
-      }).catch((error) => {
-        console.error('Firebase save error:', error)
-        showError('データの保存に失敗しました。もう一度お試しください。')
-      })
+      if (doIncrementUserCount) {
+        getDataFromFirebase(groupId).then((existingData) => {
+          if (!existingData) {
+            incrementUserCount();
+          }
+          window.localStorage.setItem(userCountKey, 'true');
+          saveDataToFirebase(groupId, { children: updatedChildren, form })
+            .then(handleAfterSave)
+            .catch((error) => {
+              console.error('Firebase save error:', error);
+              showError('データの保存に失敗しました。もう一度お試しください。');
+            });
+        });
+      } else {
+        saveDataToFirebase(groupId, { children: updatedChildren, form })
+          .then(handleAfterSave)
+          .catch((error) => {
+            console.error('Firebase save error:', error);
+            showError('データの保存に失敗しました。もう一度お試しください。');
+          });
+      }
     } else {
       // Firebase なし（ローカルのみ）
-      incrementChildCount()
-      
-      // フォームをリセット
-      setForm(getInitialForm())
-      clearFieldErrors()
-      showSuccess()
+      incrementChildCount();
+      // フォームはリセットしない（入力内容を残す）
+      clearFieldErrors();
+      showSuccess();
     }
   }
 
-  const removeChild = (id) => {
+  const removeChild = async (id) => {
     if (!window.confirm('この子供を削除してもよろしいですか？')) {
       return
     }
@@ -419,7 +429,7 @@ function App() {
       if (updatedChildren.length === 0) {
         // 子どもが全員削除された場合、DBからグループを削除
         try {
-          deleteDataFromFirebase(groupId)
+          await deleteDataFromFirebase(groupId)
         } catch (error) {
           console.error('Failed to delete group from Firebase:', error)
         }

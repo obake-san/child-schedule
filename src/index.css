@@ -1,3 +1,50 @@
+.child-card {
+  margin-top: 0 !important;
+}
+.child-filter-tabs {
+  margin-top: 0 !important;
+}
+/* child-filter-tabs, status-filter-tabs の高さ・上寄せを強制 */
+.child-filter-tabs,
+.status-filter-tabs {
+  height: 38px !important;
+  align-items: flex-start !important;
+  display: flex;
+}
+.child-filter-tabs button,
+.status-filter-tabs button {
+  height: 100% !important;
+  align-items: flex-start !important;
+  display: flex;
+}
+/* ステータスラベル */
+.item-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 600;
+  margin-left: 4px;
+  margin-right: 2px;
+  letter-spacing: 0.02em;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px #ccc;
+  min-width: 56px;
+  justify-content: center;
+}
+.item-status.status-未対応 {
+  background: #e0e0e0;
+  color: #757575;
+}
+.item-status.status-対応中 {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+.item-status.status-完了 {
+  background: #ffebee;
+  color: #e53935;
+}
 /* メニューポップアップ用: セクションと同じデザイン */
 .floating-menu-popup {
   background: var(--panel-bg);
