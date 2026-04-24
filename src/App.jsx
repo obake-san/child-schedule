@@ -1656,18 +1656,18 @@ END:VEVENT
                   />
                 </label>
               </div>
-            </div>
-            <div className="modal-footer">
-              <button className="delete-button" onClick={deleteSchedule}>
-                削除
-              </button>
-              <div className="modal-actions">
-                <button className="cancel-button" onClick={closeScheduleEditor}>
-                  キャンセル
+              <div className="modal-footer">
+                <button className="delete-button" onClick={deleteSchedule}>
+                  削除
                 </button>
-                <button className="save-button" onClick={saveScheduleEdit}>
-                  保存
-                </button>
+                <div className="modal-actions">
+                  <button className="cancel-button" onClick={closeScheduleEditor}>
+                    キャンセル
+                  </button>
+                  <button className="save-button" onClick={saveScheduleEdit}>
+                    保存
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1824,16 +1824,15 @@ END:VEVENT
                   />
                 </label>
               </div>
-            </div>
-
-            <div className="modal-footer">
-              <div className="modal-actions">
-                <button className="cancel-button" onClick={closeScheduleAdder}>
-                  キャンセル
-                </button>
-                <button className="save-button" onClick={saveNewSchedule}>
-                  追加
-                </button>
+              <div className="modal-footer">
+                <div className="modal-actions">
+                  <button className="cancel-button" onClick={closeScheduleAdder}>
+                    キャンセル
+                  </button>
+                  <button className="save-button" onClick={saveNewSchedule}>
+                    追加
+                  </button>
+                </div>
               </div>
             </div>
           </div>
