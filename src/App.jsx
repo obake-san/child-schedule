@@ -428,9 +428,7 @@ function App() {
   }
 
   const removeChild = async (id) => {
-    if (!window.confirm('この子供を削除してもよろしいですか？')) {
-      return
-    }
+    // window.confirmは使わず、即時削除
     const updatedChildren = children.filter((child) => child.id !== id)
     setChildren(updatedChildren)
     
@@ -561,23 +559,21 @@ function App() {
     if (groupId) {
       saveDataToFirebase(groupId, { children: updatedChildren, form }).catch((error) => {
         console.error('Firebase save error:', error)
-        alert('スケジュール保存エラーが発生しました。')
+        setError(prev => ({ ...prev, firebase: 'スケジュール保存エラーが発生しました。' }));
       })
     }
-    
+
     // ローカルストレージに自動保存
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedChildren))
-      setSaveSuccess(true)
-      setTimeout(() => setSaveSuccess(false), 3000)
-      
-      // スケジュール追加成功を通知
       const selectedChildren = updatedChildren.filter(c => selectedChildrenForSchedule.includes(c.id))
       const childNames = selectedChildren.map(c => c.name).join('、')
-      alert(`スケジュール「${addScheduleForm.title}」を${childNames}に登録しました。`)
+      setSaveSuccess(`スケジュール「${addScheduleForm.title}」を${childNames}に登録しました。`)
+      setTimeout(() => setSaveSuccess(false), 3000)
     } catch (error) {
       console.error('ローカルストレージの保存エラー:', error)
-      alert('スケジュール保存エラーが発生しました。')
+      setError(prev => ({ ...prev, firebase: 'スケジュール保存エラーが発生しました。' }));
+      return;
     }
 
     closeScheduleAdder()
@@ -715,13 +711,13 @@ function App() {
           if (importedData.form) {
             setForm(importedData.form)
           }
-          setSaveSuccess(true)
+          setSaveSuccess('データをインポートしました')
           setTimeout(() => setSaveSuccess(false), 2000)
         } else {
-          alert('不正なファイル形式です。')
+          setError(prev => ({ ...prev, import: '不正なファイル形式です。' }))
         }
       } catch (error) {
-        alert('ファイルの読み込みに失敗しました。')
+        setError(prev => ({ ...prev, import: 'ファイルの読み込みに失敗しました。' }))
       }
     }
     reader.readAsText(file)
@@ -730,12 +726,11 @@ function App() {
 
   const openShareModal = (childId = null) => {
     const shareUrlValue = generateShareUrl(children, form, groupId, childId)
-    
-    // クリップボードにコピー
     navigator.clipboard.writeText(shareUrlValue).then(() => {
-      alert('共有URLをコピーしました！この URLを他の人に送ることでデータが共有できます。')
+      setSaveSuccess('共有URLをコピーしました！この URLを他の人に送ることでデータが共有できます。')
+      setTimeout(() => setSaveSuccess(false), 3000)
     }).catch(() => {
-      alert('クリップボードへのコピーに失敗しました。')
+      setError(prev => ({ ...prev, share: 'クリップボードへのコピーに失敗しました。' }))
     })
   }
 
@@ -830,13 +825,14 @@ END:VEVENT
     element.click()
     document.body.removeChild(element)
 
-    alert('カレンダーファイルをダウンロードしました。\nGoogleカレンダーの「他のカレンダーを追加」から「アップロード」を選択して、ダウンロードしたファイルをインポートしてください。')
+    setSaveSuccess('カレンダーファイルをダウンロードしました。Googleカレンダーの「他のカレンダーを追加」から「アップロード」を選択して、ダウンロードしたファイルをインポートしてください。')
+    setTimeout(() => setSaveSuccess(false), 4000)
   }
 
   // Google Calendarにスケジュール登録（自動登録）
   const registerToGoogleCalendar = async () => {
     if (children.length === 0) {
-      alert('子どもが登録されていません。')
+      setError(prev => ({ ...prev, google: '子どもが登録されていません。' }))
       return
     }
 
@@ -846,19 +842,12 @@ END:VEVENT
     })
 
     if (totalSchedules === 0) {
-      alert('登録されたスケジュールがありません。')
+      setError(prev => ({ ...prev, google: '登録されたスケジュールがありません。' }))
       return
     }
 
     // ユーザーに警告
-    const confirmed = window.confirm(
-      `${totalSchedules}件のスケジュールを Google カレンダーに追加します。\n\n` +
-      `複数のウィンドウが順番に開きます。\n` +
-      `各ウィンドウで「保存」をクリックしてください。\n\n` +
-      `ポップアップブロック設定を確認してください。`
-    )
-
-    if (!confirmed) return
+    // window.confirmは使わず、即時実行
 
     try {
       // Google Calendar イベント作成URL を生成
@@ -926,26 +915,14 @@ END:VEVENT
       }
 
       if (failCount > 0) {
-        alert(
-          `処理完了\n\n` +
-          `開かれたウィンドウ: ${successCount}件\n` +
-          `ブロックされたウィンドウ: ${failCount}件\n\n` +
-          `各ウィンドウで「保存」をクリック後、ウィンドウを手動で閉じてください。\n` +
-          `ポップアップブロック設定を確認し、再度実行してください。`
-        )
+        setError(prev => ({ ...prev, google: `処理完了 開かれたウィンドウ: ${successCount}件, ブロック: ${failCount}件。各ウィンドウで「保存」をクリック後、ウィンドウを手動で閉じてください。ポップアップブロック設定を確認し、再度実行してください。` }))
       } else {
-        alert(
-          `` +
-          `${totalSchedules}件のスケジュール登録ウィンドウを開きました。\n\n` +
-          `【操作手順】\n` +
-          `1. 各ウィンドウで「保存」をクリック\n` +
-          `2. ウィンドウを手動で閉じる\n` +
-          `3. 全て完了後、Googleカレンダーを確認`
-        )
+        setSaveSuccess(`${totalSchedules}件のスケジュール登録ウィンドウを開きました。各ウィンドウで「保存」をクリックし、ウィンドウを手動で閉じてください。`)
+        setTimeout(() => setSaveSuccess(false), 4000)
       }
     } catch (err) {
       console.error('Calendar registration error:', err)
-      alert('Googleカレンダーへの登録に失敗しました。\n\nエラー: ' + err.message)
+      setError(prev => ({ ...prev, google: 'Googleカレンダーへの登録に失敗しました。エラー: ' + err.message }))
     }
   }
 
@@ -1091,9 +1068,7 @@ END:VEVENT
   }
 
   const deleteSchedule = () => {
-    if (!window.confirm('このスケジュールを削除してもよろしいですか？')) {
-      return
-    }
+    // window.confirmは使わず、即時削除
     
     // scheduleItem から実際の childId を取得
     const actualChildId = (() => {
@@ -1537,7 +1512,19 @@ END:VEVENT
               スケジュールデータを読み込み
             </label>
           </div>
-          {saveSuccess && <p className="save-success">データを保存しました</p>}
+          {saveSuccess && <p className="save-success">{typeof saveSuccess === 'string' ? saveSuccess : 'データを保存しました'}</p>}
+          {error && error.firebase && (
+            <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error.firebase}</p>
+          )}
+          {error && error.import && (
+            <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error.import}</p>
+          )}
+          {error && error.share && (
+            <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error.share}</p>
+          )}
+          {error && error.google && (
+            <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error.google}</p>
+          )}
           <p className="data-policy" style={{ fontSize: '0.9rem', color: '#666', marginTop: '16px', lineHeight: '1.6', textAlign: 'left' }}>
             <strong>データ保持について：</strong>
             <br />
