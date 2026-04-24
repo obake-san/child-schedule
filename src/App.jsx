@@ -16,6 +16,9 @@ import { downloadCalendarFile } from './utils/calendar'
 import { importDataFromFile, clearFileInput, validateImportedData } from './utils/importExport'
 
 function App() {
+        // ステータスフィルター（複数選択対応）
+        const STATUS_LIST = ['未対応', '対応中', '完了', '期限切れ'];
+        const [statusFilter, setStatusFilter] = useState(STATUS_LIST);
       // メニューからやることリスト押下時にviewModeを切り替えるカスタムイベントリスナー
       useEffect(() => {
         const handler = () => setViewMode('list');
@@ -1391,79 +1394,118 @@ END:VEVENT
               </div>
             </div>
             <div className="child-filter-tabs">
+              <span className="child-filter-label">子ども：</span>
               <button
                 type="button"
-                className={selectedChildIds.length === 0 ? 'active' : ''}
+                className={selectedChildIds.length === 0 || selectedChildIds.length === children.length ? 'active' : ''}
                 onClick={() => setSelectedChildIds([])}
               >
                 すべて
               </button>
-              {children.length >= 3 &&
-                children.map((child) => (
-                  <button
-                    key={child.id}
-                    type="button"
-                    className={selectedChildIds.includes(child.id) ? 'active' : ''}
-                    onClick={() => {
-                      if (selectedChildIds.includes(child.id)) {
-                        setSelectedChildIds(selectedChildIds.filter(id => id !== child.id))
+              {children.map((child) => (
+                <button
+                  key={child.id}
+                  type="button"
+                  className={selectedChildIds.includes(child.id) ? 'active' : ''}
+                  onClick={() => {
+                    if (selectedChildIds.includes(child.id)) {
+                      // 選択解除
+                      const newIds = selectedChildIds.filter(id => id !== child.id);
+                      setSelectedChildIds(newIds);
+                    } else {
+                      // 追加選択
+                      setSelectedChildIds([...selectedChildIds, child.id]);
+                    }
+                  }}
+                >
+                  {child.name}
+                </button>
+              ))}
+            {/* ステータスフィルター: 子どもフィルターの下に改行して配置 */}
+          </div>
+          <div className="status-filter-tabs" style={{ margin: '12px 0 10px 0', display: 'flex', gap: 8 }}>
+            <span className="status-filter-label">ステータス：</span>
+            <button
+              type="button"
+              className={statusFilter.length === STATUS_LIST.length ? 'active' : ''}
+              onClick={() => {
+                setStatusFilter(STATUS_LIST); // 常に全選択
+              }}
+            >
+              すべて
+            </button>
+            {STATUS_LIST.map((status) => (
+              <button
+                key={status}
+                type="button"
+                className={statusFilter.includes(status) ? 'active' : ''}
+                onClick={() => {
+                  if (statusFilter.includes(status)) {
+                    // 1つだけ選択解除しようとした場合は全選択に戻す
+                    if (statusFilter.length === 1) {
+                      setStatusFilter(STATUS_LIST);
+                    } else {
+                      const newFilter = statusFilter.filter(s => s !== status);
+                      // 全て解除しようとした場合も全選択に戻す
+                      if (newFilter.length === 0) {
+                        setStatusFilter(STATUS_LIST);
                       } else {
-                        setSelectedChildIds([...selectedChildIds, child.id])
+                        setStatusFilter(newFilter);
                       }
-                    }}
-                  >
-                    {child.name}
-                  </button>
-                ))}
-              {children.length < 3 &&
-                children.map((child) => (
-                  <button
-                    key={child.id}
-                    type="button"
-                    className={selectedChildIds.includes(child.id) ? 'active' : ''}
-                    onClick={() => setSelectedChildIds([child.id])}
-                  >
-                    {child.name}
-                  </button>
-                ))}
-            </div>
+                    }
+                  } else {
+                    setStatusFilter([...statusFilter, status]);
+                  }
+                }}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
             {/* 表示切り替え */}
             {viewMode === 'list' && (
               summary
                 .filter((child) => selectedChildIds.length === 0 || selectedChildIds.includes(child.id))
-                .map((child) => (
-                  <article key={child.id} className="child-card">
-                    <div className="child-header">
-                      <div>
-                        <h3>{child.name}</h3>
-                        <p>生年月日: {formatDate(child.birthDate)}（{calculateAge(child.birthDate)}）</p>
-                        <p>性別: {child.gender === 'male' ? '男の子' : '女の子'}</p>
-                      </div>
-                    </div>
-                    <div className="schedule-grid">
-                      {child.schedule.map((item) => (
-                        <div
-                          key={`${child.id}-${item.date}-${item.title}`}
-                          className="schedule-item"
-                          onClick={() => openScheduleEditor(child.id, item)}
-                          style={{ cursor: 'pointer' }}
-                        >
-                          <div className="item-meta">
-                            <span className="item-date">{formatRange(item.date, item.endDate)}</span>
-                            <span className={`item-category category-${item.category}`}>
-                              {item.category}
-                            </span>
-                            <span className={`item-category status-category status-${item.status || '未対応'}`} style={{ marginLeft: 8 }}>
-                              {item.status || '未対応'}
-                            </span>
-                          </div>
-                          <strong>{item.title}</strong>
-                          <p>{item.description}</p>
+                .map((child) => {
+                  // ステータスフィルター適用（複数選択）
+                  const filteredSchedule = statusFilter.length === 0
+                    ? []
+                    : child.schedule.filter(item => statusFilter.includes(item.status));
+                  if (filteredSchedule.length === 0) return null;
+                  return (
+                    <article key={child.id} className="child-card">
+                      <div className="child-header">
+                        <div>
+                          <h3>{child.name}</h3>
+                          <p>生年月日: {formatDate(child.birthDate)}（{calculateAge(child.birthDate)}）</p>
+                          <p>性別: {child.gender === 'male' ? '男の子' : '女の子'}</p>
                         </div>
-                      ))}
-                    </div>
-                  </article>
-                ))
+                      </div>
+                      <div className="schedule-grid">
+                        {filteredSchedule.map((item) => (
+                          <div
+                            key={`${child.id}-${item.date}-${item.title}`}
+                            className="schedule-item"
+                            onClick={() => openScheduleEditor(child.id, item)}
+                            style={{ cursor: 'pointer' }}
+                          >
+                            <div className="item-meta">
+                              <span className="item-date">{formatRange(item.date, item.endDate)}</span>
+                              <span className={`item-category category-${item.category}`}>
+                                {item.category}
+                              </span>
+                              <span className={`item-category status-category status-${item.status || '未対応'}`} style={{ marginLeft: 8 }}>
+                                {item.status || '未対応'}
+                              </span>
+                            </div>
+                            <strong>{item.title}</strong>
+                            <p>{item.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </article>
+                  );
+                })
             )}
             {viewMode === 'combined-calendar' && (
               <ChildCalendar
@@ -1471,9 +1513,11 @@ END:VEVENT
                   {
                     id: 'combined',
                     name: '統合',
-                    schedule: selectedChildIds.length > 0
-                      ? combinedSchedule.filter(item => selectedChildIds.includes(item.childId))
-                      : combinedSchedule
+                    schedule:
+                      (selectedChildIds.length > 0
+                        ? combinedSchedule.filter(item => selectedChildIds.includes(item.childId))
+                        : combinedSchedule
+                      ).filter(item => statusFilter.length === 0 ? false : statusFilter.includes(item.status))
                   }
                 ]}
                 selectedChildIds={['combined']}

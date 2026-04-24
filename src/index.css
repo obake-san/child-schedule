@@ -1,8 +1,30 @@
+@media (max-width: 600px) {
+  .modal-body {
+    padding: 0 !important;
+  }
+}
+/* フィルターバーのラベルをボタンと同じ文字サイズ・太さに */
+.child-filter-label, .status-filter-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  /* width: 100%; ← 削除済み。今後追加されても無効化 */
+}
+
+/* 念のためメディアクエリ内も全てwidth:100%を消す */
+@media (max-width: 600px) {
+  .child-filter-label,
+  .status-filter-label {
+    /* width: 100%; ← 削除済み */
+  }
+}
 .child-card {
   margin-top: 0 !important;
 }
 .child-filter-tabs {
-  margin-top: 0 !important;
+  /* margin-top: 0 !important; 削除 */
 }
 /* child-filter-tabs, status-filter-tabs の高さ・上寄せを強制 */
 .child-filter-tabs,
@@ -12,10 +34,29 @@
   display: flex;
 }
 .child-filter-tabs button,
-.status-filter-tabs button {
-  height: 100% !important;
-  align-items: flex-start !important;
+
+.status-filter-tabs {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.status-filter-tabs button {
+  border: 2px solid #E8C4A8;
+  background: #FAF3ED;
+  color: #9B7662;
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.status-filter-tabs button.active {
+  background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
+  color: white;
+  border-color: #4ade80;
 }
 /* ステータスラベル */
 .item-status {
@@ -273,25 +314,56 @@ main {
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 12px;
-  margin-bottom: 20px;
 }
 
 .child-filter-tabs button {
-  border: 2px solid #E8C4A8;
-  background: #FAF3ED;
-  color: #9B7662;
+  border: 2px solid var(--color-primary-border);
+  background: var(--color-primary-lighter);
+  color: var(--color-text-light);
   border-radius: 999px;
-  padding: 8px 14px;
+  padding: 6px 12px;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 700;
+  font-size: 0.92rem;
   transition: all 0.2s;
+  outline: none;
+}
+
+.child-filter-tabs button:hover {
+  background: var(--button-hover-bg);
+  color: #fff;
+  border-color: var(--color-primary);
 }
 
 .child-filter-tabs button.active {
-  background: linear-gradient(135deg, #86efac 0%, #4ade80 100%);
-  color: white;
-  border-color: #4ade80;
+	background: var(--button-bg);
+	color: #fff;
+	border-color: var(--color-primary);
+}
+
+.status-filter-tabs button {
+  border: 2px solid var(--color-primary-border);
+  background: var(--color-primary-lighter);
+  color: var(--color-text-light);
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.92rem;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.status-filter-tabs button:hover {
+  background: var(--button-hover-bg);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+.status-filter-tabs button.active {
+  background: var(--button-bg);
+  color: #fff;
+  border-color: var(--color-primary);
 }
 
 /* Googleカレンダー風UIの実裁E*/
