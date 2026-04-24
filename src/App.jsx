@@ -497,25 +497,40 @@ function App() {
       todos: [],
       supplies: [],
       status: '未対応'
-    })
+    });
+    setError({ title: '', date: '', children: '' });
   }
 
   const saveNewSchedule = () => {
     // バリデーション
-    setError('');
+    // エラー状態を個別に管理
+    const errors = {
+      title: '',
+      date: '',
+      children: '',
+    };
     if (!addScheduleForm.title || !addScheduleForm.title.trim()) {
-      setError('スケジュール名を入力してください。')
-      return
+      errors.title = 'スケジュール名を入力してください。';
     }
     if (!addScheduleForm.date) {
-      setError('開始日を入力してください。')
-      return
+      errors.date = '開始日を入力してください。';
     }
     if (selectedChildrenForSchedule.length === 0) {
-      setError('子どもを選択してください。')
-      return
+      errors.children = '子どもを選択してください。';
     }
-    // 開始日と終了日のバリデーション（削除済み）
+    if (
+      addScheduleForm.date &&
+      addScheduleForm.endDate &&
+      new Date(addScheduleForm.date) > new Date(addScheduleForm.endDate)
+    ) {
+      errors.date = '開始日は終了日以前の日付を選択してください。';
+    }
+    // どれか1つでもエラーがあれば表示して終了
+    if (errors.title || errors.date || errors.children) {
+      setError(errors);
+      return;
+    }
+    setError({ title: '', date: '', children: '' });
 
     // 複数の子どもで共有するID
     const sharedScheduleId = crypto.randomUUID()
@@ -958,28 +973,39 @@ END:VEVENT
       category: '育児準備',
       todos: [],
       supplies: []
-    })
+    });
+    setError({ title: '', date: '' });
   }
 
   const saveScheduleEdit = () => {
     
-    const title = editForm.title.trim()
+    // エラー状態を個別に管理
+    const errors = {
+      title: '',
+      date: '',
+    };
+    const title = editForm.title.trim();
     if (!title || !validateLength(title, 200)) {
-      setError('タイトルは1文字以上200文字以下で入力してください。')
-      return
+      errors.title = 'スケジュール名を入力してください。';
     }
-    
     if (!editForm.date || !validateDate(editForm.date)) {
-      setError('正しい開始日を入力してください。')
-      return
+      errors.date = '正しい開始日を入力してください。';
     }
-    
     if (!editForm.endDate || !validateDate(editForm.endDate)) {
-      setError('正しい終了日を入力してください。')
-      return
+      errors.date = '正しい終了日を入力してください。';
     }
-    
-    // 開始日と終了日のバリデーション（削除済み）
+    if (
+      editForm.date &&
+      editForm.endDate &&
+      new Date(editForm.date) > new Date(editForm.endDate)
+    ) {
+      errors.date = '開始日は終了日以前の日付を選択してください。';
+    }
+    if (errors.title || errors.date) {
+      setError(errors);
+      return;
+    }
+    setError({ title: '', date: '' });
 
     // scheduleItem から実際の childId を取得
     // カレンダーの場合は "combined" が渡されるため、childName から検索
@@ -1552,6 +1578,9 @@ END:VEVENT
                     autoComplete="off"
                   />
                 </label>
+                {error && error.title && (
+                  <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error.title}</p>
+                )}
 
                 {/* カテゴリ */}
                 <label>
@@ -1597,6 +1626,9 @@ END:VEVENT
                     autoComplete="off"
                   />
                 </label>
+                {error && error.date && (
+                  <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error.date}</p>
+                )}
 
                 {/* 終了日 */}
                 <label>
@@ -1706,6 +1738,9 @@ END:VEVENT
                     ))}
                   </div>
                 </fieldset>
+                {error && error.children && (
+                  <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error.children}</p>
+                )}
 
                 {/* スケジュール名 */}
                 <label>
@@ -1720,6 +1755,9 @@ END:VEVENT
                     autoComplete="off"
                   />
                 </label>
+                {error && error.title && (
+                  <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error.title}</p>
+                )}
 
                 {/* カテゴリ */}
                 <label>
@@ -1765,8 +1803,8 @@ END:VEVENT
                     autoComplete="off"
                   />
                 </label>
-                {error && (
-                  <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error}</p>
+                {error && error.date && (
+                  <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error.date}</p>
                 )}
 
                 {/* 終了日 */}
