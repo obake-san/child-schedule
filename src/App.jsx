@@ -502,20 +502,20 @@ function App() {
 
   const saveNewSchedule = () => {
     // バリデーション
+    setError('');
     if (!addScheduleForm.title || !addScheduleForm.title.trim()) {
-      alert('スケジュール名を入力してください。')
+      setError('スケジュール名を入力してください。')
       return
     }
-    
     if (!addScheduleForm.date) {
-      alert('開始日を入力してください。')
+      setError('開始日を入力してください。')
       return
     }
-    
     if (selectedChildrenForSchedule.length === 0) {
-      alert('子どもを選択してください。')
+      setError('子どもを選択してください。')
       return
     }
+    // 開始日と終了日のバリデーション（削除済み）
 
     // 複数の子どもで共有するID
     const sharedScheduleId = crypto.randomUUID()
@@ -979,10 +979,7 @@ END:VEVENT
       return
     }
     
-    if (new Date(editForm.date) > new Date(editForm.endDate)) {
-      setError('開始日は終了日以前の日付を選択してください。')
-      return
-    }
+    // 開始日と終了日のバリデーション（削除済み）
 
     // scheduleItem から実際の childId を取得
     // カレンダーの場合は "combined" が渡されるため、childName から検索
@@ -1768,6 +1765,9 @@ END:VEVENT
                     autoComplete="off"
                   />
                 </label>
+                {error && (
+                  <p className="form-error" style={{ color: '#e53e3e', marginTop: 8 }}>{error}</p>
+                )}
 
                 {/* 終了日 */}
                 <label>
