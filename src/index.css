@@ -40,10 +40,50 @@
 .item-status.status-対応中 {
   background: #e3f2fd;
   color: #1976d2;
+  border: 1.5px solid #90caf9;
 }
 .item-status.status-完了 {
+  background: #f5f5f5;
+  color: #616161;
+  border: 1.5px solid #bdbdbd;
+}
+.item-status.status-期限切れ {
   background: #ffebee;
   color: #e53935;
+  border: 1.5px solid #ffcdd2;
+}
+/* カレンダー用ステータスラベル */
+.calendar-status-label {
+  display: inline-block;
+  min-width: 48px;
+  padding: 2px 10px;
+  margin-right: 6px;
+  border-radius: 12px;
+  font-size: 0.82em;
+  font-weight: 600;
+  vertical-align: middle;
+  letter-spacing: 0.01em;
+  border: 1.5px solid #fff;
+  box-shadow: 0 0 0 1px #ccc;
+}
+.calendar-status-label.status-未対応 {
+  background: #e0e0e0;
+  color: #757575;
+}
+.calendar-status-label.status-対応中 {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: 1.5px solid #90caf9;
+}
+.calendar-status-label.status-完了 {
+  background: #f5f5f5;
+  color: #616161;
+  border: 1.5px solid #bdbdbd;
+}
+.calendar-status-label.status-期限切れ {
+  background: #ffebee;
+  color: #e53935;
+  border: 1.5px solid #ffcdd2;
 }
 /* メニューポップアップ用: セクションと同じデザイン */
 .floating-menu-popup {
@@ -312,7 +352,7 @@ main {
   margin: 0 0 16px 0;
 }
 
-/* カレンダーグリチE�E��E� */
+/* カレンダーグリチEEE */
 .calendar-week {
   display: flex;
   flex-direction: column;
@@ -322,7 +362,7 @@ main {
   margin-bottom: 1px;
 }
 
-/* 日付�EチE�E��E�ー */
+/* 日付EチEEEー */
 .calendar-timeline-header {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -467,7 +507,7 @@ main {
   display: none;
 }
 
-/* カチE�E��E�リーカラー�E�E�E�Eoogleカレンダー風�E�E�E�E*/
+/* カチEEEリーカラーEEEEoogleカレンダー風EEEE*/
 .calendar-event.category-行政手続き {
   border-left-color: #b084cc;
   border-color: #b084cc;
@@ -1210,7 +1250,7 @@ main {
   transform: translateY(-2px);
 }
 
-/* 子ども選択チェチE�E��E�ボックスのスタイル */
+/* 子ども選択チェチEEEボックスのスタイル */
 .children-selection {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1244,7 +1284,7 @@ main {
   font-weight: 600;
 }
 
-/* 共有�Eタンのスタイル */
+/* 共有Eタンのスタイル */
 .share-button {
   background: #22c55e;
   color: white;
@@ -1441,43 +1481,43 @@ main {
 
 .tile-event.category-入学準備 {
   border-left-color: #b084cc;
-  background-color: #d8b4fe;
+  background: #d8b4fe;
   color: #6b21a8;
 }
 
 .tile-event.category-健康診断 {
   border-left-color: #a78bfa;
-  background-color: #e9d5ff;
+  background: #e9d5ff;
   color: #6b21a8;
 }
 
 .tile-event.category-行政手続き {
   border-left-color: #b084cc;
-  background-color: #d8b4fe;
+  background: #d8b4fe;
   color: #6b21a8;
 }
 
 .tile-event.category-生活・成長 {
   border-left-color: #f87171;
-  background-color: #fecaca;
+  background: #fecaca;
   color: #991b1b;
 }
 
 .tile-event.category-教育・発達 {
   border-left-color: #0284c7;
-  background-color: #bae6fd;
+  background: #bae6fd;
   color: #0c4a6e;
 }
 
 .tile-event.category-行事・記念イベント {
   border-left-color: #ec4899;
-  background-color: #fbcfe8;
+  background: #fbcfe8;
   color: #9d174d;
 }
 
 .tile-event.category-学校関連 {
   border-left-color: #0891b2;
-  background-color: #a5f3fc;
+  background: #a5f3fc;
   color: #0e5459;
 }
 
@@ -1768,7 +1808,7 @@ main {
   }
 }
 
-/* タブレチE�E��E��E�E�E�E40px - 1023px�E�E�E�E*/
+/* タブレチE�E��EEEEE40px - 1023px�E�E�E�E*/
 @media (min-width: 640px) and (max-width: 1023px) {
   .app-shell {
     padding: 20px;
@@ -2354,5 +2394,27 @@ main {
     padding: 10px 14px;
     font-size: 0.85rem;
   }
+}
+
+/* ステータスの色分け */
+.item-category.status-category.status-未対応 {
+  background: #fff !important;
+  color: #757575 !important;
+  border: 1.5px solid #e0e0e0 !important;
+}
+.item-category.status-category.status-対応中 {
+  background: #e3f2fd !important;
+  color: #1976d2 !important;
+  border: 1.5px solid #90caf9 !important;
+}
+.item-category.status-category.status-完了 {
+  background: #f5f5f5 !important;
+  color: #616161 !important;
+  border: 1.5px solid #bdbdbd !important;
+}
+.item-category.status-category.status-期限切れ {
+  background: #ffebee !important;
+  color: #e53935 !important;
+  border: 1.5px solid #ffcdd2 !important;
 }
 

@@ -52,7 +52,8 @@ function App() {
     description: '',
     category: '育児準備',
     todos: [],
-    supplies: []
+    supplies: [],
+    status: '未対応'
   })
 
   useEffect(() => {
@@ -244,11 +245,20 @@ function App() {
       const filteredLocalitySchedule = localityScheduleWithCalculatedDates.filter(s => !excludedIds.has(s.id))
       
       const combined = [...filteredAutoSchedule, ...filteredLocalitySchedule, ...customSchedule]
-        .map(item => ({
-          ...item,
-          childId: child.id,
-          childName: child.name
-        }))
+        .map(item => {
+          // ステータス自動変換: 終了日が過去かつ完了以外は「期限切れ」
+          const todayStr = new Date().toISOString().slice(0, 10)
+          let status = item.status || '未対応'
+          if (status !== '完了' && item.endDate && item.endDate < todayStr) {
+            status = '期限切れ'
+          }
+          return {
+            ...item,
+            status,
+            childId: child.id,
+            childName: child.name
+          }
+        })
         .filter(item => {
           // カスタムスケジュールは常に表示
           const isCustom = customIds.has(item.id)
@@ -485,7 +495,8 @@ function App() {
       description: '',
       category: '育児準備',
       todos: [],
-      supplies: []
+      supplies: [],
+      status: '未対応'
     })
   }
 
@@ -521,7 +532,8 @@ function App() {
         description: addScheduleForm.description || '',
         category: addScheduleForm.category || '育児準備',
         todos: Array.isArray(addScheduleForm.todos) ? addScheduleForm.todos.filter(t => t && t.trim()) : [],
-        supplies: Array.isArray(addScheduleForm.supplies) ? addScheduleForm.supplies.filter(s => s && s.trim()) : []
+        supplies: Array.isArray(addScheduleForm.supplies) ? addScheduleForm.supplies.filter(s => s && s.trim()) : [],
+        status: addScheduleForm.status || '未対応'
       }
       customSchedules.push(newSchedule)
 
@@ -931,7 +943,8 @@ END:VEVENT
       description: scheduleItem.description || '',
       category: scheduleItem.category,
       todos: scheduleItem.todos || [],
-      supplies: scheduleItem.supplies || []
+      supplies: scheduleItem.supplies || [],
+      status: scheduleItem.status || '未対応'
     })
   }
 
@@ -1004,7 +1017,8 @@ END:VEVENT
         description: sanitizeInput(editForm.description || ''),
         category: sanitizeInput(editForm.category || '育児準備'),
         todos: Array.isArray(editForm.todos) ? editForm.todos.map(t => sanitizeInput(t)) : [],
-        supplies: Array.isArray(editForm.supplies) ? editForm.supplies.map(s => sanitizeInput(s)) : []
+        supplies: Array.isArray(editForm.supplies) ? editForm.supplies.map(s => sanitizeInput(s)) : [],
+        status: editForm.status || '未対応'
       }
 
       if (existingIndex >= 0) {
@@ -1441,6 +1455,9 @@ END:VEVENT
                             <span className={`item-category category-${item.category}`}>
                               {item.category}
                             </span>
+                            <span className={`item-category status-category status-${item.status || '未対応'}`} style={{ marginLeft: 8 }}>
+                              {item.status || '未対応'}
+                            </span>
                           </div>
                           <strong>{item.title}</strong>
                           <p>{item.description}</p>
@@ -1552,6 +1569,22 @@ END:VEVENT
                     {availableCategories.map((category) => (
                       <option key={category} value={category}>{category}</option>
                     ))}
+                  </select>
+                </label>
+
+                {/* ステータス（編集） */}
+                <label>
+                  ステータス
+                  <select
+                    id="edit-status"
+                    name="status"
+                    value={editForm.status || '未対応'}
+                    onChange={e => setEditForm({ ...editForm, status: e.target.value })}
+                  >
+                    <option value="未対応">未対応</option>
+                    <option value="対応中">対応中</option>
+                    <option value="完了">完了</option>
+                    <option value="期限切れ">期限切れ</option>
                   </select>
                 </label>
 
@@ -1705,6 +1738,22 @@ END:VEVENT
                     {availableCategories.map((category) => (
                       <option key={category} value={category}>{category}</option>
                     ))}
+                  </select>
+                </label>
+
+                {/* ステータス（追加） */}
+                <label>
+                  ステータス
+                  <select
+                    id="add-status"
+                    name="status"
+                    value={addScheduleForm.status || '未対応'}
+                    onChange={e => setAddScheduleForm({ ...addScheduleForm, status: e.target.value })}
+                  >
+                    <option value="未対応">未対応</option>
+                    <option value="対応中">対応中</option>
+                    <option value="完了">完了</option>
+                    <option value="期限切れ">期限切れ</option>
                   </select>
                 </label>
 
@@ -1981,4 +2030,4 @@ END:VEVENT
   );
 }
 
-export default App
+export default App;

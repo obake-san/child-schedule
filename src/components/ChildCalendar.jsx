@@ -170,6 +170,9 @@ export function ChildCalendar({ children, selectedChildIds, onEventClick }) {
                             onClick={() => onEventClick && onEventClick(event.childId, event)}
                           >
                             <div className="calendar-event-title">
+                              {event.status && (
+                                <span className={`calendar-status-label status-${event.status}`}>{event.status}</span>
+                              )}
                               {event.childName}: {event.title}
                             </div>
                             <div className="calendar-event-range">
