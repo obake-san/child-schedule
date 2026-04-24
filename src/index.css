@@ -788,10 +788,11 @@ main {
 .calendar-event.category-予防接種 { background: #86efac; color: #166534; }
 .calendar-event.category-保育園 { background: #f8bef0; color: #9d174d; }
 .item-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
+.category-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
   margin-bottom: 10px;
 }
 
@@ -1024,8 +1025,8 @@ main {
 .modal-content {
   background: linear-gradient(135deg, #FAF3ED 0%, #F5E6D3 100%);
   border-radius: 24px;
-  max-width: 600px;
-  width: 90% !important;
+  max-width: 700px;
+  width: 96% !important;
   max-height: 90vh;
   height: 80vh;
   min-height: 320px;
@@ -1733,8 +1734,8 @@ main {
   }
 
   .modal-content {
-    width: 90% !important;
-    max-width: 600px;
+    width: 96% !important;
+    max-width: 700px;
     max-height: 90vh;
     padding: 16px !important;
   }
