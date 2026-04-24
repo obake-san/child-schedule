@@ -17,7 +17,7 @@ import { importDataFromFile, clearFileInput, validateImportedData } from './util
 
 function App() {
         // ステータスフィルター（複数選択対応）
-        const STATUS_LIST = ['未対応', '対応中', '完了', '期限切れ'];
+        const STATUS_LIST = ['未対応', '対応中', '完了'];
         const [statusFilter, setStatusFilter] = useState(STATUS_LIST);
       // メニューからやることリスト押下時にviewModeを切り替えるカスタムイベントリスナー
       useEffect(() => {
@@ -1393,6 +1393,14 @@ END:VEVENT
                 </button>
               </div>
             </div>
+            {/* child-filter-tabsの前にモバイル用ラベルを追加 */}
+            <span className="child-filter-label-mobile" style={{
+              display: 'none',
+              fontWeight: 500,
+              fontSize: '1rem',
+              marginLeft: 0,
+              marginBottom: 4
+            }}>子ども：</span>
             <div className="child-filter-tabs">
               <span className="child-filter-label">子ども：</span>
               <button
@@ -1423,8 +1431,36 @@ END:VEVENT
               ))}
             {/* ステータスフィルター: 子どもフィルターの下に改行して配置 */}
           </div>
-          <div className="status-filter-tabs" style={{ margin: '12px 0 10px 0', display: 'flex', gap: 8 }}>
+          {/* モバイル用ステータスラベル */}
+          <span className="status-filter-label-mobile" style={{
+            display: 'none',
+            fontWeight: 500,
+            fontSize: '1rem',
+            marginLeft: 0,
+            marginBottom: 4
+          }}>ステータス：</span>
+          <div className="status-filter-tabs" style={{
+            margin: window.innerWidth > 600 ? '12px 0px 10px' : '0px 0px 20px',
+            display: 'flex',
+            gap: 8
+          }}>
             <span className="status-filter-label">ステータス：</span>
+                    {/* モバイル時のみ表示するCSS */}
+                    <style>{`
+                      @media (max-width: 600px) {
+                        .child-filter-label,
+                        .status-filter-label {
+                          display: none !important;
+                        }
+                        .status-filter-label-mobile {
+                          display: inline-block !important;
+                          font-weight: 500;
+                          font-size: 1rem;
+                          margin-left: 0;
+                          margin-bottom: 4px;
+                        }
+                      }
+                    `}</style>
             <button
               type="button"
               className={statusFilter.length === STATUS_LIST.length ? 'active' : ''}
@@ -2093,6 +2129,25 @@ END:VEVENT
           setShowPolicyModal(true)
         }}
       />
+
+        {/* モバイル時にラベルを非表示・表示にするCSS */}
+        <style>{`
+          @media (max-width: 600px) {
+            .child-filter-label,
+            .status-filter-label {
+              display: none !important;
+            }
+            .child-filter-label-mobile,
+            .status-filter-label-mobile {
+              display: inline-block !important;
+              font-weight: 500;
+              font-size: 1rem;
+              margin-left: 0;
+              margin-top: 10px;
+              margin-bottom: 0px !important;
+            }
+          }
+        `}</style>
 
     </div>
     </>
