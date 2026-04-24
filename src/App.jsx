@@ -17,8 +17,8 @@ import { importDataFromFile, clearFileInput, validateImportedData } from './util
 
 function App() {
         // ステータスフィルター（複数選択対応）
-        const STATUS_LIST = ['未対応', '対応中', '完了'];
-        const [statusFilter, setStatusFilter] = useState(STATUS_LIST);
+        const STATUS_LIST = ['未対応', '対応中', '完了', '期限切れ'];
+        const [statusFilter, setStatusFilter] = useState([...STATUS_LIST]);
       // メニューからやることリスト押下時にviewModeを切り替えるカスタムイベントリスナー
       useEffect(() => {
         const handler = () => setViewMode('list');
@@ -36,9 +36,20 @@ function App() {
   
   // Custom hooks for state management
   const { children, setChildren, editingChildId, setEditingChildId, editChildForm, setEditChildForm, resetEditChildForm } = useChildrenState()
+  const [selectedChildIds, setSelectedChildIds] = useState([]);
+
+  // childrenが変わったら全選択
+  useEffect(() => {
+    if (children && children.length > 0) {
+      setSelectedChildIds(children.map(child => child.id));
+    } else {
+      setSelectedChildIds([]);
+    }
+  }, [children])
+
   const { form, setForm, error, setError, fieldErrors, setFieldErrors, clearFieldErrors, saveSuccess, setSaveSuccess, resetForm, showError, showSuccess } = useFormState()
   const { editingSchedule, setEditingSchedule, editForm, setEditForm, addingSchedule, setAddingSchedule, selectedChildrenForSchedule, setSelectedChildrenForSchedule, resetEditForm, closeEditor } = useScheduleEditState()
-  const { viewMode, setViewMode, groupId, setGroupId, selectedChildIds, setSelectedChildIds, currentCombinedMonth, setCurrentCombinedMonth, resetUI } = useUIState()
+  const { viewMode, setViewMode, groupId, setGroupId, currentCombinedMonth, setCurrentCombinedMonth, resetUI } = useUIState()
   
   // ポリシーモーダル状態
   const [showPolicyModal, setShowPolicyModal] = useState(false)
@@ -1406,7 +1417,7 @@ END:VEVENT
               <button
                 type="button"
                 className={selectedChildIds.length === 0 || selectedChildIds.length === children.length ? 'active' : ''}
-                onClick={() => setSelectedChildIds([])}
+                onClick={() => setSelectedChildIds(children.map(child => child.id))}
               >
                 すべて
               </button>
@@ -1416,13 +1427,17 @@ END:VEVENT
                   type="button"
                   className={selectedChildIds.includes(child.id) ? 'active' : ''}
                   onClick={() => {
+                    let newIds;
                     if (selectedChildIds.includes(child.id)) {
-                      // 選択解除
-                      const newIds = selectedChildIds.filter(id => id !== child.id);
-                      setSelectedChildIds(newIds);
+                      newIds = selectedChildIds.filter(id => id !== child.id);
                     } else {
-                      // 追加選択
-                      setSelectedChildIds([...selectedChildIds, child.id]);
+                      newIds = [...selectedChildIds, child.id];
+                    }
+                    // 全て選択されたら全選択状態に
+                    if (newIds.length === children.length) {
+                      setSelectedChildIds(children.map(child => child.id));
+                    } else {
+                      setSelectedChildIds(newIds);
                     }
                   }}
                 >
@@ -1464,9 +1479,7 @@ END:VEVENT
             <button
               type="button"
               className={statusFilter.length === STATUS_LIST.length ? 'active' : ''}
-              onClick={() => {
-                setStatusFilter(STATUS_LIST); // 常に全選択
-              }}
+              onClick={() => setStatusFilter([...STATUS_LIST])}
             >
               すべて
             </button>
@@ -1476,22 +1489,15 @@ END:VEVENT
                 type="button"
                 className={statusFilter.includes(status) ? 'active' : ''}
                 onClick={() => {
+                  let newFilter;
                   if (statusFilter.includes(status)) {
-                    // 1つだけ選択解除しようとした場合は全選択に戻す
-                    if (statusFilter.length === 1) {
-                      setStatusFilter(STATUS_LIST);
-                    } else {
-                      const newFilter = statusFilter.filter(s => s !== status);
-                      // 全て解除しようとした場合も全選択に戻す
-                      if (newFilter.length === 0) {
-                        setStatusFilter(STATUS_LIST);
-                      } else {
-                        setStatusFilter(newFilter);
-                      }
-                    }
+                    // 1つだけ選択解除しようとした場合は何もしない（最低1つは選択）
+                    if (statusFilter.length === 1) return;
+                    newFilter = statusFilter.filter(s => s !== status);
                   } else {
-                    setStatusFilter([...statusFilter, status]);
+                    newFilter = [...statusFilter, status];
                   }
+                  setStatusFilter(newFilter);
                 }}
               >
                 {status}

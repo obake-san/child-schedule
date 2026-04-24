@@ -65,34 +65,32 @@ const FilterRow = ({
       </div>
       {/* ステータスフィルター */}
       <div className="status-filter-tabs" style={{ display: 'flex', gap: 8, marginLeft: 'auto', height: '100%', alignItems: 'flex-start' }}>
-        {['すべて', '未対応', '対応中', '完了'].map(status => {
-          const isActive = statusFilter.includes(status);
-          return (
-            <button
-              key={status}
-              type="button"
-              className={isActive ? 'active' : ''}
-              onClick={() => {
-                if (status === 'すべて') {
-                  setStatusFilter(['すべて']);
-                } else {
-                  setStatusFilter(prev => {
-                    let next;
-                    if (prev.includes(status)) {
-                      next = prev.filter(s => s !== status);
-                    } else {
-                      next = prev.filter(s => s !== 'すべて').concat(status);
-                    }
-                    return next.length === 0 ? ['すべて'] : next;
-                  });
-                }
-              }}
-              style={filterButtonStyle(isActive)}
-            >
-              {status}
-            </button>
-          );
-        })}
+        <button
+          type="button"
+          className={statusFilter.length === 4 ? 'active' : ''}
+          onClick={() => setStatusFilter(['未対応', '対応中', '完了', '期限切れ'])}
+          style={filterButtonStyle(statusFilter.length === 4)}
+        >すべて</button>
+        {['未対応', '対応中', '完了', '期限切れ'].map(status => (
+          <button
+            key={status}
+            type="button"
+            className={statusFilter.includes(status) ? 'active' : ''}
+            onClick={() => {
+              if (statusFilter.includes(status)) {
+                // 1つだけ選択解除しようとした場合は何もしない（最低1つは選択）
+                if (statusFilter.length === 1) return;
+                setStatusFilter(statusFilter.filter(s => s !== status));
+              } else {
+                const newFilter = [...statusFilter, status];
+                setStatusFilter(newFilter.length === 4 ? ['未対応', '対応中', '完了', '期限切れ'] : newFilter);
+              }
+            }}
+            style={filterButtonStyle(statusFilter.includes(status))}
+          >
+            {status}
+          </button>
+        ))}
       </div>
       {/* 切り替えボタン */}
       {showViewToggle && (
