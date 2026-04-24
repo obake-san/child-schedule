@@ -1657,7 +1657,6 @@ END:VEVENT
                 </label>
               </div>
             </div>
-
             <div className="modal-footer">
               <button className="delete-button" onClick={deleteSchedule}>
                 削除
@@ -1847,7 +1846,8 @@ END:VEVENT
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" onClick={closeEditChild}>×</button>
             <h2>子供情報を編集</h2>
-            <div className="edit-form">
+            <div className="modal-body">
+              <div className="edit-form">
               <label>
                 名前（ニックネーム）
                 <input
@@ -1986,6 +1986,7 @@ END:VEVENT
                   保存
                 </button>
               </div>
+            </div>
             </div>
           </div>
         </div>

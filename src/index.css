@@ -1025,13 +1025,21 @@ main {
   background: linear-gradient(135deg, #FAF3ED 0%, #F5E6D3 100%);
   border-radius: 24px;
   max-width: 600px;
-  width: 90%;
+  width: 90% !important;
   max-height: 90vh;
-  overflow-y: auto;
+  height: 80vh;
+  min-height: 320px;
+  overflow: hidden;
   box-shadow: 0 20px 50px rgba(180, 140, 120, 0.15);
   border: 2px solid #E8C4A8;
   position: relative;
   z-index: 2001;
+  padding: 16px !important;
+}
+
+.modal-body {
+  overflow-y: auto;
+  max-height: 60vh;
 }
 
 .modal-header {
@@ -1725,7 +1733,8 @@ main {
   }
 
   .modal-content {
-    width: 95% !important;
+    width: 90% !important;
+    max-width: 600px;
     max-height: 90vh;
     padding: 16px !important;
   }
@@ -1858,6 +1867,7 @@ main {
 
   .modal-content {
     width: 90% !important;
+    max-width: 600px;
   }
 
   .schedule-list {
