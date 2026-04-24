@@ -799,6 +799,7 @@ main {
 .item-date {
   color: #334155;
   font-weight: 700;
+  margin-right: 18px;
 }
 
 .item-category {
