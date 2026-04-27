@@ -1559,7 +1559,7 @@ main {
 
 .tile-event.category-育児準備 {
   border-left-color: #d97706;
-  background-color: #fecab8;
+  background: #fecab8;
   color: #92400e;
 }
 
@@ -1719,7 +1719,7 @@ main {
    レスポンシブデザイン
    ===================================================== */
 
-/* モバイル�E�E�E�E 640px�E�E�E�E*/
+/* モバイルEEEE 640pxEEEE*/
 @media (max-width: 639px) {
   .app-shell {
     padding: 20px;
@@ -1882,7 +1882,7 @@ main {
     margin-bottom: 16px;
   }
 
-  /* タチE�E��E�フレンドリーなボタンサイズ */
+  /* タチEEEフレンドリーなボタンサイズ */
   button {
     min-height: 44px; /* AWS/iOS 推奨 */
     min-width: 44px;
@@ -1893,7 +1893,7 @@ main {
   }
 }
 
-/* タブレチE�E��EEEEE40px - 1023px�E�E�E�E*/
+/* タブレチEEEEEEE40px - 1023pxEEEE*/
 @media (min-width: 640px) and (max-width: 1023px) {
   .app-shell {
     padding: 20px;
@@ -1958,7 +1958,7 @@ main {
   }
 }
 
-/* チE�E��E�クトップ！E= 1024px�E�E�E�E*/
+/* チEEEクトップ！E= 1024pxEEEE*/
 @media (min-width: 1024px) {
   .app-shell {
     max-width: 1200px;
@@ -1998,7 +1998,7 @@ main {
   }
 }
 
-/* 高解像度チE�E��E�スプレイ */
+/* 高解像度チEEEスプレイ */
 @media (min-width: 1440px) {
   .app-shell {
     max-width: 1400px;
@@ -2013,7 +2013,7 @@ main {
   }
 }
 
-/* タチE�E��E�スクリーン最適匁E*/
+/* タチEEEスクリーン最適匁E*/
 @media (hover: none) and (pointer: coarse) {
   button {
     min-height: 48px; /* iOS/Android 推奨 */
@@ -2135,7 +2135,7 @@ main {
   text-align: center;
 }
 
-/* 月ピチE�E��E�ーモーダル */
+/* 月ピチEEEーモーダル */
 .month-picker-overlay {
   position: fixed;
   top: 0;
@@ -2502,5 +2502,64 @@ main {
   background: #ffebee !important;
   color: #e53935 !important;
   border: 1.5px solid #ffcdd2 !important;
+}
+
+.react-select__control {
+  width: 100%;
+  padding: 0;
+  border: 2px solid var(--color-primary-border) !important;
+  border-radius: 14px !important;
+  background: white !important;
+  font-family: inherit;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  min-height: 48px !important;
+  box-shadow: none !important;
+}
+
+.react-select__value-container {
+  padding: 12px 14px !important;
+}
+
+.react-select__input-container {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.react-select__single-value {
+  color: #222 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.2 !important;
+}
+
+.react-select__placeholder {
+  color: #888 !important;
+  font-size: 0.95rem !important;
+  line-height: 1.2 !important;
+}
+
+.react-select__menu {
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(180, 140, 120, 0.12);
+  border: 2px solid #E8C4A8;
+  background: #fff;
+  z-index: 100;
+}
+
+.react-select__option {
+  font-size: 0.95rem;
+  color: #334155;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.react-select__option--is-focused {
+  background: #FAF3ED;
+  color: #B57C56;
+}
+
+.react-select__option--is-selected {
+  background: #E8C4A8;
+  color: #B57C56;
 }
 

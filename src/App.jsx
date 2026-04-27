@@ -1,4 +1,5 @@
 import FloatingMenuButton from './components/FloatingMenuButton'
+import Select from 'react-select'
 
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { ChildCalendar } from './components/ChildCalendar'
@@ -1230,36 +1231,43 @@ END:VEVENT
 
             <label>
               性別
-              <select
+              <Select
                 id="child-gender"
                 name="gender"
-                value={form.gender}
-                onChange={(event) => setForm({ ...form, gender: event.target.value })}
-              >
-                <option value="male">男の子</option>
-                <option value="female">女の子</option>
-              </select>
+                options={[
+                  { value: 'male', label: '男の子' },
+                  { value: 'female', label: '女の子' }
+                ]}
+                value={form.gender ? { value: form.gender, label: form.gender === 'male' ? '男の子' : '女の子' } : null}
+                onChange={option => setForm({ ...form, gender: option ? option.value : '' })}
+                placeholder="選択してください"
+                classNamePrefix="react-select"
+                styles={{
+                  placeholder: (base) => ({ ...base, color: '#888' })
+                }}
+              />
             </label>
+            {fieldErrors.gender && <p className="form-error">{fieldErrors.gender}</p>}
 
             <label>
               住んでいる都道府県
-              <select
+              <Select
                 id="child-prefecture"
                 name="prefecture"
-                value={form.prefecture}
-                onChange={(event) => {
-                  const prefecture = event.target.value
+                options={Object.keys(PREFECTURES_MUNICIPALITIES).map(pref => ({ value: pref, label: pref }))
+                }
+                value={form.prefecture ? { value: form.prefecture, label: form.prefecture } : null}
+                onChange={option => {
+                  const prefecture = option ? option.value : ''
                   setForm({ ...form, prefecture, municipality: '' })
                 }}
-                autoComplete="off"
-              >
-                <option value="">選択してください</option>
-                {Object.keys(PREFECTURES_MUNICIPALITIES).map((pref) => (
-                  <option key={pref} value={pref}>
-                    {pref}
-                  </option>
-                ))}
-              </select>
+                placeholder="選択または検索してください"
+                isClearable
+                classNamePrefix="react-select"
+                styles={{
+                  placeholder: (base) => ({ ...base, color: '#888' })
+                }}
+              />
             </label>
             {fieldErrors.prefecture && <p className="form-error">{fieldErrors.prefecture}</p>}
 
@@ -1267,20 +1275,19 @@ END:VEVENT
               <>
                 <label>
                   住んでいる市町村
-                  <select
+                  <Select
                     id="child-municipality"
                     name="municipality"
-                    value={form.municipality}
-                    onChange={(event) => setForm({ ...form, municipality: event.target.value })}
-                    autoComplete="off"
-                  >
-                    <option value="">選択してください</option>
-                  {PREFECTURES_MUNICIPALITIES[form.prefecture] && PREFECTURES_MUNICIPALITIES[form.prefecture].map((city) => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
+                    options={PREFECTURES_MUNICIPALITIES[form.prefecture]?.map(city => ({ value: city, label: city })) || []}
+                    value={form.municipality ? { value: form.municipality, label: form.municipality } : null}
+                    onChange={option => setForm({ ...form, municipality: option ? option.value : '' })}
+                    placeholder="選択または検索してください"
+                    isClearable
+                    classNamePrefix="react-select"
+                    styles={{
+                      placeholder: (base) => ({ ...base, color: '#888' })
+                    }}
+                  />
                 </label>
                 {fieldErrors.municipality && <p className="form-error">{fieldErrors.municipality}</p>}
               </>
@@ -1986,35 +1993,43 @@ END:VEVENT
 
               <label>
                 性別
-                <select
+                <Select
                   id="edit-child-gender"
                   name="gender"
-                  value={editChildForm.gender}
-                  onChange={(e) => setEditChildForm({ ...editChildForm, gender: e.target.value })}
-                >
-                  <option value="male">男の子</option>
-                  <option value="female">女の子</option>
-                </select>
+                  options={[
+                    { value: 'male', label: '男の子' },
+                    { value: 'female', label: '女の子' }
+                  ]}
+                  value={editChildForm.gender ? { value: editChildForm.gender, label: editChildForm.gender === 'male' ? '男の子' : '女の子' } : null}
+                  onChange={option => setForm({ ...form, gender: option ? option.value : '' })}
+                  placeholder="選択してください"
+                  classNamePrefix="react-select"
+                  styles={{
+                    placeholder: (base) => ({ ...base, color: '#888' })
+                  }}
+                />
               </label>
+              {fieldErrors.gender && <p className="form-error">{fieldErrors.gender}</p>}
 
               <label>
                 住んでいる都道府県
-                <select
+                <Select
                   id="edit-child-prefecture"
                   name="prefecture"
-                  value={editChildForm.prefecture}
-                  onChange={(e) => {
-                    const prefecture = e.target.value
+                  options={Object.keys(PREFECTURES_MUNICIPALITIES).map(pref => ({ value: pref, label: pref }))
+                  }
+                  value={editChildForm.prefecture ? { value: editChildForm.prefecture, label: editChildForm.prefecture } : null}
+                  onChange={option => {
+                    const prefecture = option ? option.value : ''
                     setEditChildForm({ ...editChildForm, prefecture, municipality: '' })
                   }}
-                >
-                  <option value="">選択してください</option>
-                  {Object.keys(PREFECTURES_MUNICIPALITIES).map((pref) => (
-                    <option key={pref} value={pref}>
-                      {pref}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="選択または検索してください"
+                  isClearable
+                  classNamePrefix="react-select"
+                  styles={{
+                    placeholder: (base) => ({ ...base, color: '#888' })
+                  }}
+                />
               </label>
               {fieldErrors.prefecture && <p className="form-error">{fieldErrors.prefecture}</p>}
 
@@ -2022,19 +2037,19 @@ END:VEVENT
                 <>
                   <label>
                     住んでいる市町村
-                    <select
+                    <Select
                       id="edit-child-municipality"
                       name="municipality"
-                      value={editChildForm.municipality}
-                      onChange={(e) => setEditChildForm({ ...editChildForm, municipality: e.target.value })}
-                    >
-                      <option value="">選択してください</option>
-                      {PREFECTURES_MUNICIPALITIES[editChildForm.prefecture] && PREFECTURES_MUNICIPALITIES[editChildForm.prefecture].map((city) => (
-                        <option key={city} value={city}>
-                          {city}
-                        </option>
-                      ))}
-                    </select>
+                      options={PREFECTURES_MUNICIPALITIES[editChildForm.prefecture]?.map(city => ({ value: city, label: city })) || []}
+                      value={editChildForm.municipality ? { value: editChildForm.municipality, label: editChildForm.municipality } : null}
+                      onChange={option => setEditChildForm({ ...editChildForm, municipality: option ? option.value : '' })}
+                      placeholder="選択または検索してください"
+                      isClearable
+                      classNamePrefix="react-select"
+                      styles={{
+                        placeholder: (base) => ({ ...base, color: '#888' })
+                      }}
+                    />
                   </label>
                   {fieldErrors.municipality && <p className="form-error">{fieldErrors.municipality}</p>}
                 </>
