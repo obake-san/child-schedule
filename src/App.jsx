@@ -1,4 +1,5 @@
 import FloatingMenuButton from './components/FloatingMenuButton'
+import { Header } from './components/Header'
 import Select from 'react-select'
 
 import { useEffect, useMemo, useState, useRef } from 'react'
@@ -1189,31 +1190,7 @@ END:VEVENT
 
   return (
     <>
-      {/* 固定ヘッダー */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '48px',
-        background: 'linear-gradient(135deg, #E8B896 0%, #B57C56 100%)',
-        color: '#fff',
-        display: 'flex',
-        alignItems: 'center',
-        zIndex: 1200,
-        boxShadow: '0 2px 8px rgba(181,124,86,0.15)',
-        padding: '0 12px',
-      }}>
-        <span
-          style={{ fontWeight: 700, fontSize: '1.2rem', letterSpacing: '0.05em', textAlign: 'left', cursor: 'pointer', flex: 1 }}
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        >
-          楽々キッズかれんだぁ
-        </span>
-        <div style={{ height: '100%', display: 'flex', alignItems: 'center', marginLeft: 8 }}>
-          <FloatingMenuButton childrenCount={children.length} />
-        </div>
-      </div>
+      <Header childrenCount={children.length} />
       <div style={{ height: '48px' }} /> {/* ヘッダー分の余白 */}
       <div className="app-shell">
       <header className="hero">

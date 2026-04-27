@@ -98,8 +98,10 @@ function getMenuItems(childrenCount) {
   }
   items.push(
     { label: 'データ管理', action: () => scrollToSection('data-management') },
-    { label: 'お願い箱', action: () => window.open('https://forms.gle/Pa2Nt4J8qay9nLNA9', '_blank') },
-    { label: 'お問い合わせ', action: () => window.open('https://docs.google.com/forms/d/e/1FAIpQLSeq1ra0qFQbCvJ97m1uF_QU77QOFqvoIVga6Bdt386M4MEvnw/viewform', '_blank') }
+    // FAQリンクを「お願い箱」と「お問い合わせ」の間に追加
+    { label: 'FAQ', action: () => window.location.href = '/faq.html' },
+    { label: 'お願い箱', action: () => window.location.href = 'https://forms.gle/Pa2Nt4J8qay9nLNA9' },
+    { label: 'お問い合わせ', action: () => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSeq1ra0qFQbCvJ97m1uF_QU77QOFqvoIVga6Bdt386M4MEvnw/viewform' }
   );
   return items;
 }
