@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://child-schedule-make.web.app/sitemap.xml
