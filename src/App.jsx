@@ -740,18 +740,9 @@ function App() {
     }
   }
 
+  // エクスポート（JSON）
   const exportData = () => {
-    const dataToExport = { children, form }
-    const dataStr = JSON.stringify(dataToExport, null, 2)
-    const dataBlob = new Blob([dataStr], { type: 'application/json' })
-    const url = URL.createObjectURL(dataBlob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `kodomo-schedule-${new Date().toISOString().slice(0, 10)}.json`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    exportDataAsJSON(children, form);
   }
 
   const importData = (event) => {
@@ -791,98 +782,14 @@ function App() {
   }
 
   // .ics ファイル（カレンダーフォーマット）を生成しダウンロード
+// ...existing code...
+  // Googleカレンダーエクスポート
   const exportToGoogleCalendar = () => {
-    // スケジュールの総数を数える（自動生成+手動追加）
-    let totalSchedules = 0
-    let scheduleCounts = []
-    
-    summary.forEach(child => {
-      const count = child.schedule.length
-      totalSchedules += count
-      if (count > 0) {
-        scheduleCounts.push(`${child.name}: ${count}件`)
-      }
-    })
-
-    if (children.length === 0) {
-      alert('子どもが登録されていません。先に子どもを登録してください。')
-      return
+    const result = downloadCalendarFile(summary, children);
+    if (result) {
+      setSaveSuccess('カレンダーファイルをダウンロードしました。Googleカレンダーの「他のカレンダーを追加」から「アップロード」を選択して、ダウンロードしたファイルをインポートしてください。');
+      setTimeout(() => setSaveSuccess(false), 4000);
     }
-
-    if (totalSchedules === 0) {
-      const childrenNames = children.map(c => c.name).join('、')
-      alert(`登録されたスケジュールがありません。\n\n登録済みの子ども: ${childrenNames}\n\n各子どもの「スケジュール追加」ボタンからスケジュールを登録してください。\n（自動生成されるスケジュールもあります）`)
-      return
-    }
-
-    // .ics ファイル内容を生成
-    const now = new Date()
-    let icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//楽々キッズかれんだぁ//
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-X-WR-CALNAME:楽々キッズかれんだぁ
-X-WR-TIMEZONE:Asia/Tokyo
-BEGIN:VTIMEZONE
-TZID:Asia/Tokyo
-BEGIN:STANDARD
-TZOFFSETFROM:+0900
-TZOFFSETTO:+0900
-TZNAME:JST
-DTSTART:19700101T000000
-END:STANDARD
-END:VTIMEZONE
-`
-
-    // 全てのスケジュールをカレンダーイベントに変換（自動生成+手動追加）
-    summary.forEach(child => {
-      child.schedule.forEach((schedule, idx) => {
-        const startDate = new Date(schedule.date + 'T000000')
-        const endDate = new Date(schedule.endDate ? schedule.endDate + 'T235959' : schedule.date + 'T235959')
-        
-        // ISO 8601 形式に変換（YYYYMMDDTHHMMSS）
-        const formatDateForIcs = (date) => {
-          const year = date.getFullYear()
-          const month = String(date.getMonth() + 1).padStart(2, '0')
-          const day = String(date.getDate()).padStart(2, '0')
-          const hours = String(date.getHours()).padStart(2, '0')
-          const minutes = String(date.getMinutes()).padStart(2, '0')
-          const seconds = String(date.getSeconds()).padStart(2, '0')
-          return `${year}${month}${day}T${hours}${minutes}${seconds}`
-        }
-
-        const eventSummary = `${child.name}：${schedule.title}`
-        const eventDescription = `カテゴリ：${schedule.category}\n${schedule.description || ''}`
-        const uid = `${child.id}-${schedule.date}-${idx}@kodomo-schedule.local`
-
-        icsContent += `BEGIN:VEVENT
-UID:${uid}
-DTSTAMP:${formatDateForIcs(now)}Z
-DTSTART:${formatDateForIcs(startDate)}
-DTEND:${formatDateForIcs(endDate)}
-SUMMARY:${eventSummary}
-DESCRIPTION:${eventDescription.replace(/\n/g, '\\n')}
-STATUS:CONFIRMED
-TRANSP:OPAQUE
-END:VEVENT
-`
-      })
-    })
-
-    icsContent += `END:VCALENDAR`
-
-    // ファイルをダウンロード
-    const element = document.createElement('a')
-    const file = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' })
-    element.href = URL.createObjectURL(file)
-    element.download = `楽々キッズかれんだぁ_${new Date().toISOString().slice(0, 10)}.ics`
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
-
-    setSaveSuccess('カレンダーファイルをダウンロードしました。Googleカレンダーの「他のカレンダーを追加」から「アップロード」を選択して、ダウンロードしたファイルをインポートしてください。')
-    setTimeout(() => setSaveSuccess(false), 4000)
   }
 
   // Google Calendarにスケジュール登録（自動登録）
@@ -1461,7 +1368,14 @@ END:VEVENT
               <button
                 type="button"
                 className={selectedChildIds.length === 0 || selectedChildIds.length === children.length ? 'active' : ''}
-                onClick={() => setSelectedChildIds(children.map(child => child.id))}
+                onClick={() => {
+                  // すべてが選択されている場合は全OFF、そうでなければ全ON
+                  if (selectedChildIds.length === children.length && children.length > 0) {
+                    setSelectedChildIds([]);
+                  } else {
+                    setSelectedChildIds(children.map(child => child.id));
+                  }
+                }}
               >
                 すべて
               </button>
@@ -1524,7 +1438,14 @@ END:VEVENT
             <button
               type="button"
               className={statusFilter.length === STATUS_LIST.length ? 'active' : ''}
-              onClick={() => setStatusFilter([...STATUS_LIST])}
+              onClick={() => {
+                // すべてが選択されている場合は全OFF、そうでなければ全ON
+                if (statusFilter.length === STATUS_LIST.length) {
+                  setStatusFilter([]);
+                } else {
+                  setStatusFilter([...STATUS_LIST]);
+                }
+              }}
             >
               すべて
             </button>
