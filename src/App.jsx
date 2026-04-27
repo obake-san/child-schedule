@@ -10,13 +10,56 @@ import { getLocalSchedules } from './lib/localSchedules.js'
 import { saveDataToFirebase, listenToData, checkAndDeleteOldData, updateLastAccessedAt, deleteDataFromFirebase, listenToStatistics, initializeStatistics, incrementUserCount, incrementChildCount, getDataFromFirebase } from './firebase'
 import { sanitizeInput, sanitizeObject, validateLength, validateDate, validateUUID } from './utils/security'
 import { useDeviceType } from './utils/responsive'
-import { STORAGE_KEY, FORM_STORAGE_KEY, GROUP_ID_STORAGE_KEY, PREFECTURES_MUNICIPALITIES, INITIAL_EDIT_FORM, getInitialForm, CATEGORY_ORDER } from './constants'
+import { STORAGE_KEY, FORM_STORAGE_KEY, GROUP_ID_STORAGE_KEY, INITIAL_EDIT_FORM, getInitialForm, CATEGORY_ORDER } from './constants'
 import { useChildrenState, useFormState, useScheduleEditState, useUIState } from './hooks/useAppState'
 import { createNewChild, confirmDeleteChild, validateChildEdit, updateChildInfo, validateScheduleForm, createNewSchedule, saveToLocalStorage, exportDataAsJSON, getScheduleFormDefaults, generateShareUrl, copyShareUrlToClipboard, decompressShareData } from './utils/handlers'
 import { downloadCalendarFile } from './utils/calendar'
 import { importDataFromFile, clearFileInput, validateImportedData } from './utils/importExport'
 
 function App() {
+  // まずhooksをすべて先頭で呼び出す
+  const { children, setChildren, editingChildId, setEditingChildId, editChildForm, setEditChildForm, resetEditChildForm } = useChildrenState();
+  const { form, setForm, error, setError, fieldErrors, setFieldErrors, clearFieldErrors, saveSuccess, setSaveSuccess, resetForm, showError, showSuccess } = useFormState();
+  const { editingSchedule, setEditingSchedule, editForm, setEditForm, addingSchedule, setAddingSchedule, selectedChildrenForSchedule, setSelectedChildrenForSchedule, resetEditForm, closeEditor } = useScheduleEditState();
+  const { viewMode, setViewMode, groupId, setGroupId, currentCombinedMonth, setCurrentCombinedMonth, resetUI } = useUIState();
+
+  // 動的ロード用: 都道府県→市町村データ
+  const [municipalities, setMunicipalities] = useState([]);
+  const [prefectureOptions, setPrefectureOptions] = useState([]);
+  const [municipalityLoading, setMunicipalityLoading] = useState(false);
+  // 編集モーダル用
+  const [editMunicipalities, setEditMunicipalities] = useState([]);
+
+  // 初回マウント時に都道府県リストのみロード
+  useEffect(() => {
+    import('./constants_municipalities_full').then(mod => {
+      setPrefectureOptions(Object.keys(mod.PREFECTURES_MUNICIPALITIES).map(pref => ({ value: pref, label: pref })));
+    });
+  }, []);
+
+  // 都道府県選択時に市町村リストを動的ロード（通常フォーム）
+  useEffect(() => {
+    if (!form || !form.prefecture) {
+      setMunicipalities([]);
+      return;
+    }
+    setMunicipalityLoading(true);
+    import('./constants_municipalities_full').then(mod => {
+      setMunicipalities(mod.PREFECTURES_MUNICIPALITIES[form.prefecture] || []);
+      setMunicipalityLoading(false);
+    });
+  }, [form && form.prefecture]);
+
+  // 編集モーダル用: 都道府県選択時に市町村リストを動的ロード
+  useEffect(() => {
+    if (!editChildForm || !editChildForm.prefecture) {
+      setEditMunicipalities([]);
+      return;
+    }
+    import('./constants_municipalities_full').then(mod => {
+      setEditMunicipalities(mod.PREFECTURES_MUNICIPALITIES[editChildForm.prefecture] || []);
+    });
+  }, [editChildForm && editChildForm.prefecture]);
         // ステータスフィルター（複数選択対応）
         const STATUS_LIST = ['未対応', '対応中', '完了', '期限切れ'];
         const [statusFilter, setStatusFilter] = useState([...STATUS_LIST]);
@@ -36,7 +79,6 @@ function App() {
   const deviceType = useDeviceType()
   
   // Custom hooks for state management
-  const { children, setChildren, editingChildId, setEditingChildId, editChildForm, setEditChildForm, resetEditChildForm } = useChildrenState()
   const [selectedChildIds, setSelectedChildIds] = useState([]);
 
   // childrenが変わったら全選択
@@ -48,9 +90,7 @@ function App() {
     }
   }, [children])
 
-  const { form, setForm, error, setError, fieldErrors, setFieldErrors, clearFieldErrors, saveSuccess, setSaveSuccess, resetForm, showError, showSuccess } = useFormState()
-  const { editingSchedule, setEditingSchedule, editForm, setEditForm, addingSchedule, setAddingSchedule, selectedChildrenForSchedule, setSelectedChildrenForSchedule, resetEditForm, closeEditor } = useScheduleEditState()
-  const { viewMode, setViewMode, groupId, setGroupId, currentCombinedMonth, setCurrentCombinedMonth, resetUI } = useUIState()
+  // （上記でhooksはすべて宣言済み）
   
   // ポリシーモーダル状態
   const [showPolicyModal, setShowPolicyModal] = useState(false)
@@ -1254,8 +1294,7 @@ END:VEVENT
               <Select
                 id="child-prefecture"
                 name="prefecture"
-                options={Object.keys(PREFECTURES_MUNICIPALITIES).map(pref => ({ value: pref, label: pref }))
-                }
+                options={prefectureOptions}
                 value={form.prefecture ? { value: form.prefecture, label: form.prefecture } : null}
                 onChange={option => {
                   const prefecture = option ? option.value : ''
@@ -1278,11 +1317,12 @@ END:VEVENT
                   <Select
                     id="child-municipality"
                     name="municipality"
-                    options={PREFECTURES_MUNICIPALITIES[form.prefecture]?.map(city => ({ value: city, label: city })) || []}
+                    options={municipalities.map(city => ({ value: city, label: city }))}
                     value={form.municipality ? { value: form.municipality, label: form.municipality } : null}
                     onChange={option => setForm({ ...form, municipality: option ? option.value : '' })}
-                    placeholder="選択または検索してください"
+                    placeholder={municipalityLoading ? "読み込み中..." : "選択または検索してください"}
                     isClearable
+                    isLoading={municipalityLoading}
                     classNamePrefix="react-select"
                     styles={{
                       placeholder: (base) => ({ ...base, color: '#888' })
@@ -2016,8 +2056,7 @@ END:VEVENT
                 <Select
                   id="edit-child-prefecture"
                   name="prefecture"
-                  options={Object.keys(PREFECTURES_MUNICIPALITIES).map(pref => ({ value: pref, label: pref }))
-                  }
+                  options={prefectureOptions}
                   value={editChildForm.prefecture ? { value: editChildForm.prefecture, label: editChildForm.prefecture } : null}
                   onChange={option => {
                     const prefecture = option ? option.value : ''
@@ -2040,7 +2079,7 @@ END:VEVENT
                     <Select
                       id="edit-child-municipality"
                       name="municipality"
-                      options={PREFECTURES_MUNICIPALITIES[editChildForm.prefecture]?.map(city => ({ value: city, label: city })) || []}
+                      options={editMunicipalities.map(city => ({ value: city, label: city }))}
                       value={editChildForm.municipality ? { value: editChildForm.municipality, label: editChildForm.municipality } : null}
                       onChange={option => setEditChildForm({ ...editChildForm, municipality: option ? option.value : '' })}
                       placeholder="選択または検索してください"

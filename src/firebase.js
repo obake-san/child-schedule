@@ -1,6 +1,5 @@
 import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, set, get, onValue } from 'firebase/database'
-import { getAuth } from 'firebase/auth'
 import { DEFAULT_FORM } from './constants'
 
 /**
@@ -8,7 +7,6 @@ import { DEFAULT_FORM } from './constants'
  */
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
@@ -18,7 +16,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 const database = getDatabase(app)
-const auth = getAuth(app)
 
 /**
  * フォームデータを安全に整形

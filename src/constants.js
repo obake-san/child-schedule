@@ -1,5 +1,4 @@
 
-export { PREFECTURES_MUNICIPALITIES } from "./constants_municipalities_full";
 
 // =============================
 // アプリケーション全体の定数
