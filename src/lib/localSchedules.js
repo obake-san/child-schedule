@@ -4,29 +4,6 @@
 export const localitySchedules = {
   // 東京都
   '東京都': {
-    '千代田区': {
-      name: '千代田区',
-      customSchedules: [
-        {
-          months: 0,
-          durationDays: 30,
-          title: '千代田区出生届受付',
-          description: '千代田区役所で出生届を受け付け。土日祝も対応可。',
-          category: '行政手続き',
-          todos: ['千代田区役所に訪問', '出生届提出', '出生証明書提出'],
-          supplies: ['出生届', '出生証明書', '印鑑', '本人確認書類']
-        },
-        {
-          months: 1,
-          durationDays: 7,
-          title: '千代田区新生児訪問（こんにちは赤ちゃん事業）',
-          description: '生後2週間〜1か月に保健師が自宅訪問し、育児相談や健康チェックを行います。',
-          category: '健康診断',
-          todos: ['保健師の訪問予約', '健康状態のチェック', '育児相談'],
-          supplies: ['母子健康手帳']
-        }
-      ]
-    },
     '中央区': {
       name: '中央区',
       customSchedules: [
