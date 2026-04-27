@@ -396,7 +396,7 @@ function App() {
     }
     
     if (!form.municipality || !validateLength(form.municipality, 100)) {
-      setFieldErrors(prev => ({ ...prev, municipality: '住んでいる市町村を選択してください。' }))
+      setFieldErrors(prev => ({ ...prev, municipality: '住んでいる市区町村を選択してください。' }))
       hasError = true
     }
 
@@ -656,7 +656,7 @@ function App() {
     }
     
     if (!editChildForm.municipality || !validateLength(editChildForm.municipality, 100)) {
-      setFieldErrors(prev => ({ ...prev, municipality: '住んでいる市町村を選択してください。' }))
+      setFieldErrors(prev => ({ ...prev, municipality: '住んでいる市区町村を選択してください。' }))
       hasError = true
     }
 
@@ -1313,7 +1313,7 @@ END:VEVENT
             {String(form.prefecture).length > 0 ? (
               <>
                 <label>
-                  住んでいる市町村
+                  住んでいる市区町村
                   <Select
                     id="child-municipality"
                     name="municipality"
@@ -2075,7 +2075,7 @@ END:VEVENT
               {editChildForm.prefecture ? (
                 <>
                   <label>
-                    住んでいる市町村
+                    住んでいる市区町村
                     <Select
                       id="edit-child-municipality"
                       name="municipality"
