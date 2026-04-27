@@ -1436,8 +1436,28 @@ END:VEVENT
               marginLeft: 0,
               marginBottom: 4
             }}>子ども：</span>
-            <div className="child-filter-tabs">
+            <div className="child-filter-tabs" style={{
+              margin: window.innerWidth > 600 ? '12px 0px 10px' : '0px 0px 20px',
+              display: 'flex',
+              gap: 8
+            }}>
               <span className="child-filter-label">子ども：</span>
+              {/* モバイル時のみ表示するCSS */}
+              <style>{`
+                @media (max-width: 600px) {
+                  .child-filter-label,
+                  .status-filter-label {
+                    display: none !important;
+                  }
+                  .child-filter-label-mobile {
+                    display: inline-block !important;
+                    font-weight: 500;
+                    font-size: 1rem;
+                    margin-left: 0;
+                    margin-bottom: 4px;
+                  }
+                }
+              `}</style>
               <button
                 type="button"
                 className={selectedChildIds.length === 0 || selectedChildIds.length === children.length ? 'active' : ''}
@@ -1453,6 +1473,8 @@ END:VEVENT
                   onClick={() => {
                     let newIds;
                     if (selectedChildIds.includes(child.id)) {
+                      // 1つだけ選択解除しようとした場合は何もしない（最低1つは選択）
+                      if (selectedChildIds.length === 1) return;
                       newIds = selectedChildIds.filter(id => id !== child.id);
                     } else {
                       newIds = [...selectedChildIds, child.id];
@@ -1468,8 +1490,7 @@ END:VEVENT
                   {child.name}
                 </button>
               ))}
-            {/* ステータスフィルター: 子どもフィルターの下に改行して配置 */}
-          </div>
+            </div>
           {/* モバイル用ステータスラベル */}
           <span className="status-filter-label-mobile" style={{
             display: 'none',

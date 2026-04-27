@@ -18,12 +18,12 @@ export const Header = ({ childrenCount = 0 }) => (
   }}>
     <span
       style={{ fontWeight: 700, fontSize: '1.2rem', letterSpacing: '0.05em', textAlign: 'left', cursor: 'pointer', flex: 1 }}
-      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      onClick={() => { window.location.href = '/'; }}
     >
       楽々キッズかれんだぁ
     </span>
     <nav style={{ display: 'flex', alignItems: 'center' }}>
-      <a href="/guide.html" target="_self" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 700 }}>使い方ガイド</a>
+      <a href="/guide.html" target="_self" rel="noopener noreferrer" style={{ color: '#fff', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 700 }}>利用ガイド</a>
       <div style={{ height: '100%', display: 'flex', alignItems: 'center', marginLeft: 8 }}>
         <FloatingMenuButton childrenCount={childrenCount} />
       </div>

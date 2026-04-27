@@ -21,7 +21,7 @@ const FooterContent = ({ onPolicyClick, onTermsClick }) => {
         <div className="footer-section">
           <h4>サービス</h4>
           <ul>
-            <li><a href="/guide.html" target="_self" rel="noopener noreferrer">使い方ガイド</a></li>
+            <li><a href="/guide.html" target="_self" rel="noopener noreferrer">利用ガイド</a></li>
             {/* FAQリンクを「お願い箱」と「お問い合わせ」の間に追加 */}
             <li><a href="/faq.html" target="_self" rel="noopener noreferrer">FAQ</a></li>
             <li><a href="https://forms.gle/Pa2Nt4J8qay9nLNA9" target="_self" rel="noopener noreferrer">お願い箱</a></li>

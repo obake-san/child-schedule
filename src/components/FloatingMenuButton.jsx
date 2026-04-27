@@ -71,34 +71,68 @@ const scrollToSection = (id) => {
 };
 
 
-// App.jsxのviewModeを切り替えるためのカスタムイベントを使う
-const setTodoListViewAndScroll = () => {
-  window.dispatchEvent(new CustomEvent('setViewModeList'));
-  setTimeout(() => scrollToSection('todo-calendar-section'), 0);
-};
 
-const setCalendarViewAndScroll = () => {
-  window.dispatchEvent(new CustomEvent('setViewModeCombinedCalendar'));
-  setTimeout(() => scrollToSection('todo-calendar-section'), 0);
-};
+// トップ画面に遷移してから該当セクションへスクロール＋viewMode切替
+function goToTopAnd(action) {
+  if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
+    window.location.href = '/';
+    // 遷移後のスクロールはonloadで実行（静的HTMLでもSPAでも）
+    window.sessionStorage.setItem('afterTopAction', action);
+  } else {
+    // SPA内なら即実行
+    runTopAction(action);
+  }
+}
 
+function runTopAction(action) {
+  switch (action) {
+    case 'scroll-add-child':
+      scrollToSection('add-child-section');
+      break;
+    case 'scroll-registered-children':
+      scrollToSection('registered-children');
+      break;
+    case 'show-todo-list':
+      window.dispatchEvent(new CustomEvent('setViewModeList'));
+      setTimeout(() => scrollToSection('todo-calendar-section'), 0);
+      break;
+    case 'show-calendar':
+      window.dispatchEvent(new CustomEvent('setViewModeCombinedCalendar'));
+      setTimeout(() => scrollToSection('todo-calendar-section'), 0);
+      break;
+    case 'scroll-data-management':
+      scrollToSection('data-management');
+      break;
+    default:
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
 
-// childrenCountを受け取ってメニューを動的生成
+// ページロード時にafterTopActionがあれば実行
+if (typeof window !== 'undefined') {
+  window.addEventListener('DOMContentLoaded', () => {
+    const action = window.sessionStorage.getItem('afterTopAction');
+    if (action) {
+      setTimeout(() => runTopAction(action), 100);
+      window.sessionStorage.removeItem('afterTopAction');
+    }
+  });
+}
+
 function getMenuItems(childrenCount) {
   const items = [
-    { label: 'トップ', action: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
-    { label: '子供を追加', action: () => scrollToSection('add-child-section') },
-    { label: '登録済みの子ども', action: () => scrollToSection('registered-children') },
+    { label: 'トップ', action: () => goToTopAnd('top') },
+    { label: '子どもを追加', action: () => goToTopAnd('scroll-add-child') },
+    { label: '登録済みの子供', action: () => goToTopAnd('scroll-registered-children') },
   ];
   if (childrenCount > 0) {
     items.push(
-      { label: 'やることリスト', action: setTodoListViewAndScroll },
-      { label: 'カレンダー', action: setCalendarViewAndScroll }
+      { label: 'やることリスト', action: () => goToTopAnd('show-todo-list') },
+      { label: 'カレンダー', action: () => goToTopAnd('show-calendar') }
     );
   }
   items.push(
-    { label: 'データ管理', action: () => scrollToSection('data-management') },
-    // FAQリンクを「お願い箱」と「お問い合わせ」の間に追加
+    { label: 'データ管理', action: () => goToTopAnd('scroll-data-management') },
     { label: 'FAQ', action: () => window.location.href = '/faq.html' },
     { label: 'お願い箱', action: () => window.location.href = 'https://forms.gle/Pa2Nt4J8qay9nLNA9' },
     { label: 'お問い合わせ', action: () => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSeq1ra0qFQbCvJ97m1uF_QU77QOFqvoIVga6Bdt386M4MEvnw/viewform' }
