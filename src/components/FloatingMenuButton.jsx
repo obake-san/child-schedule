@@ -133,6 +133,7 @@ function getMenuItems(childrenCount) {
   }
   items.push(
     { label: 'データ管理', action: () => goToTopAnd('scroll-data-management') },
+    { label: '利用ガイド', action: () => window.location.href = '/guide.html' },
     { label: 'FAQ', action: () => window.location.href = '/faq.html' },
     { label: 'お願い箱', action: () => window.location.href = 'https://forms.gle/Pa2Nt4J8qay9nLNA9' },
     { label: 'お問い合わせ', action: () => window.location.href = 'https://docs.google.com/forms/d/e/1FAIpQLSeq1ra0qFQbCvJ97m1uF_QU77QOFqvoIVga6Bdt386M4MEvnw/viewform' }
