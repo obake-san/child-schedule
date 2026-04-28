@@ -47,7 +47,6 @@ const mobileStyle = {
 };
 
 
-// メディアクエリで端末判定
 const useIsMobile = () => {
   const [isMobile, setIsMobile] = React.useState(false);
   React.useEffect(() => {
@@ -72,14 +71,11 @@ const scrollToSection = (id) => {
 
 
 
-// トップ画面に遷移してから該当セクションへスクロール＋viewMode切替
 function goToTopAnd(action) {
   if (window.location.pathname !== '/' && window.location.pathname !== '/index.html') {
     window.location.href = '/';
-    // 遷移後のスクロールはonloadで実行（静的HTMLでもSPAでも）
     window.sessionStorage.setItem('afterTopAction', action);
   } else {
-    // SPA内なら即実行
     runTopAction(action);
   }
 }
@@ -108,7 +104,6 @@ function runTopAction(action) {
   }
 }
 
-// ページロード時にafterTopActionがあれば実行
 if (typeof window !== 'undefined') {
   window.addEventListener('DOMContentLoaded', () => {
     const action = window.sessionStorage.getItem('afterTopAction');
@@ -147,7 +142,6 @@ const FloatingMenuButton = ({ childrenCount = 0 }) => {
   const isMobile = useIsMobile();
   const [open, setOpen] = React.useState(false);
 
-  // メニュー外クリックで閉じる
   React.useEffect(() => {
     if (!open) return;
     const handler = (e) => {
