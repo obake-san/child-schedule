@@ -2,6 +2,7 @@
  * ポリシーモーダルコンポーネント
  */
 
+import React from 'react';
 import { memo } from 'react'
 
 const PolicyModalContent = ({ type, onClose }) => {
@@ -183,4 +184,5 @@ const PolicyModalContent = ({ type, onClose }) => {
   )
 }
 
-export const PolicyModal = memo(PolicyModalContent)
+const PolicyModal = memo(PolicyModalContent);
+export default PolicyModal;

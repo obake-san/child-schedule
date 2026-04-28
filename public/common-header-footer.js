@@ -23,12 +23,13 @@ function insertCommonHeaderFooter() {
       <div class='footer-section'>
         <h4 style='color:#FFFFFF;font-size:0.95rem;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.05em;'>サービス</h4>
         <ul style='list-style:none;padding:0;margin:0;'>
-          <li style='margin-bottom:8px;'><a href='/guide.html' target='_blank' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>利用ガイド</a></li>
-          <li style='margin-bottom:8px;'><a href='/faq.html' target='_blank' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>FAQ</a></li>
-          <li style='margin-bottom:8px;'><a href='https://forms.gle/Pa2Nt4J8qay9nLNA9' target='_blank' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>お願い箱</a></li>
-          <li style='margin-bottom:8px;'><a href='https://forms.gle/BTtfyBXu1tWqecM19' target='_blank' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>お問い合わせ</a></li>
-          <li style='margin-bottom:8px;'><a href='/privacy.html' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>プライバシーポリシー</a></li>
-          <li style='margin-bottom:8px;'><a href='/terms.html' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>利用規約</a></li>
+          <li style='margin-bottom:8px;'><a href='/' target='_self' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>Top</a></li>
+          <li style='margin-bottom:8px;'><a href='/guide.html' target='_self' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>利用ガイド</a></li>
+          <li style='margin-bottom:8px;'><a href='/faq.html' target='_self' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>FAQ</a></li>
+          <li style='margin-bottom:8px;'><a href='https://forms.gle/Pa2Nt4J8qay9nLNA9' target='_self' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>お願い箱</a></li>
+          <li style='margin-bottom:8px;'><a href='https://forms.gle/BTtfyBXu1tWqecM19' target='_self' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>お問い合わせ</a></li>
+          <li style='margin-bottom:8px;'><a href='/privacy.html' target='_self' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>プライバシーポリシー</a></li>
+          <li style='margin-bottom:8px;'><a href='/terms.html' target='_self' rel='noopener noreferrer' style='color:#FFFFFF;text-decoration:none;font-size:0.9rem;transition:color 0.2s;font-family:inherit;'>利用規約</a></li>
         </ul>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import FloatingMenuButton from './FloatingMenuButton';
 
-export const Header = ({ childrenCount = 0 }) => (
+const Header = ({ childrenCount = 0 }) => (
   <div style={{
     position: 'fixed',
     top: 0,
@@ -29,3 +29,5 @@ export const Header = ({ childrenCount = 0 }) => (
       </nav>
   </div>
 );
+
+export default Header;

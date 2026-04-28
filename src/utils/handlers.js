@@ -198,7 +198,7 @@ export const generateShareUrl = (children, form, groupId, childId = null) => {
     
     // Uint8Array を Base58 エンコード
     const bytes = Array.from(compressed)
-    const encoded = bs58.encode(Buffer.isBuffer ? Buffer.from(bytes) : new Uint8Array(bytes))
+    const encoded = bs58.encode(new Uint8Array(bytes))
     
     // パス形式: /s/... （最短形式）
     return `${window.location.origin}/s/${encoded}`

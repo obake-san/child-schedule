@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { memo } from 'react'
 
@@ -19,6 +18,7 @@ const FooterContent = ({ onPolicyClick, onTermsClick }) => {
         <div className="footer-section">
           <h4>サービス</h4>
           <ul>
+            <li><a href="/" target="_self" rel="noopener noreferrer">Top</a></li>
             <li><a href="/guide.html" target="_self" rel="noopener noreferrer">利用ガイド</a></li>
             {/* FAQリンクを「お願い箱」と「お問い合わせ」の間に追加 */}
             <li><a href="/faq.html" target="_self" rel="noopener noreferrer">FAQ</a></li>
