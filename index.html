@@ -26,6 +26,16 @@
     <meta property="og:title" content="楽々キッズかれんだぁ" />
     <meta property="og:site_name" content="楽々キッズかれんだぁ" />
     <meta name="twitter:title" content="楽々キッズかれんだぁ" />
+    <!-- 開発環境ではsrc/index.css、本番ビルドではassets/index-Be0dY7In.cssを自動切替 -->
+    <script>
+      (function() {
+        var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = isLocal ? '/src/index.css' : '/assets/index-Be0dY7In.css';
+        document.head.appendChild(link);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
