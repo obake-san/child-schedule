@@ -12,6 +12,8 @@ export default function RootRouter() {
     <Router>
       <Routes>
         <Route path="/" element={<App />} />
+        {/* 共有リンク用のルートを追加 */}
+        <Route path="/s/:encoded" element={<App />} />
         <Route path="/guide" element={<Guide />} />
         <Route path="/faq" element={<Faq />} />
         <Route path="/privacy" element={<Privacy />} />
