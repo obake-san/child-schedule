@@ -1304,10 +1304,11 @@ main {
 }
 
 /* スケジュール追加ボタンのスタイル */
+
 .add-schedule-button {
   background: linear-gradient(135deg, #E8B896 0%, #B57C56 100%);
   color: white;
-  border: none;
+  border: 2px solid var(--color-primary);
   border-radius: 14px;
   padding: 10px 16px;
   cursor: pointer;
@@ -1315,6 +1316,7 @@ main {
   font-size: 0.95rem;
   white-space: nowrap;
   transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(181, 124, 86, 0.10);
 }
 
 .add-schedule-button:hover {
