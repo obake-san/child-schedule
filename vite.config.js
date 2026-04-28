@@ -7,15 +7,15 @@ export default defineConfig({
     'process.env.NODE_ENV': '"production"'
   },
   build: {
-    lib: {
-      entry: 'src/header-webcomponent.jsx',
-      name: 'CustomHeader',
-      fileName: () => 'header-webcomponent.js',
-      formats: ['iife']
-    },
-    outDir: 'public',
+    outDir: 'dist',
     emptyOutDir: false,
     minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: false,
+        drop_debugger: false
+      }
+    },
     rollupOptions: {
       external: [],
     },
