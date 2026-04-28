@@ -2086,16 +2086,7 @@ function App() {
         />
       )}
 
-      {/* フローティングボタン */}
-      <a 
-        href="https://forms.gle/Pa2Nt4J8qay9nLNA9" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="floating-feedback-button"
-        title="お願い箱"
-      >
-        お願い箱
-      </a>
+
 
       {/* フッター */}
       <Footer 
